@@ -31,6 +31,36 @@ export async function createBooking(formData) {
     })
 
   if (error) throw error;
+
+  // Trigger the email notification (fire-and-forget, wrapped in try/catch to not block the UI)
+  try {
+    const { data: emailData, error: emailError } = await supabase.functions.invoke('smart-endpoint', {
+      body: { 
+        bookingData: {
+          trip_type: formData.tripType,
+          departure: formData.departure,
+          arrival: formData.arrival,
+          pickup_date: formData.date,
+          pickup_time: formData.time,
+          passengers: formData.passengers,
+          luggage: formData.luggage,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone: formData.phone
+        } 
+      }
+    });
+
+    if (emailError) {
+      console.error('Failed to send email:', emailError);
+    } else {
+      console.log('Email sent successfully:', emailData);
+    }
+  } catch (err) {
+    console.error('Error invoking send-email function:', err);
+  }
+
   return data;
 }
 
