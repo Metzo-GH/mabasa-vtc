@@ -1,16 +1,31 @@
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Clock, MessageCircle, Send, CheckCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageCircle, Send, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { BRAND } from '../../config/brand';
+import { createContact } from '../../services/contactService';
 import './Contact.css';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Contact form:', form);
-    setSubmitted(true);
+    setIsLoading(true);
+    setSubmitError(null);
+
+    try {
+      await createContact(form);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Contact submission error:', err);
+      setSubmitError(
+        'Une erreur est survenue. Veuillez réessayer ou nous contacter par téléphone.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -142,9 +157,18 @@ export default function Contact() {
                     onChange={(e) => setForm(prev => ({ ...prev, message: e.target.value }))}
                   />
                 </div>
-                <button type="submit" className="btn btn-primary btn-lg">
-                  <Send size={18} />
-                  Envoyer le message
+                {submitError && (
+                  <div className="contact__error">
+                    <AlertCircle size={16} />
+                    {submitError}
+                  </div>
+                )}
+                <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <><Loader2 size={18} className="spin" /> Envoi en cours...</>
+                  ) : (
+                    <><Send size={18} /> Envoyer le message</>
+                  )}
                 </button>
               </form>
             )}

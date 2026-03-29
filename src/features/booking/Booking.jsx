@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import {
   MapPin, Calendar, Clock, Users, Luggage,
-  ArrowRight, ArrowLeftRight, CheckCircle, Send, AlertCircle
+  ArrowRight, ArrowLeftRight, CheckCircle, Send, AlertCircle, Loader2
 } from 'lucide-react';
 import { BRAND, ZONES } from '../../config/brand';
+import { createBooking } from '../../services/bookingService';
 import './Booking.css';
 
 const TRIP_TYPES = [
@@ -34,6 +35,8 @@ export default function Booking() {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const updateField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -74,13 +77,24 @@ export default function Booking() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateStep2()) {
-      // For now, just show success. In Phase 2, this will save to Supabase
-      console.log('Booking submitted:', form);
+    if (!validateStep2()) return;
+
+    setIsLoading(true);
+    setSubmitError(null);
+
+    try {
+      await createBooking(form);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('Booking submission error:', err);
+      setSubmitError(
+        'Une erreur est survenue. Veuillez réessayer ou nous contacter directement.'
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -416,13 +430,23 @@ export default function Booking() {
                 </div>
               </div>
 
+              {submitError && (
+                <div className="booking__error">
+                  <AlertCircle size={16} />
+                  {submitError}
+                </div>
+              )}
+
               <div className="booking__submit-row">
-                <button type="button" className="btn btn-secondary" onClick={() => setStep(1)}>
+                <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} disabled={isLoading}>
                   Retour
                 </button>
-                <button type="submit" className="btn btn-primary btn-lg">
-                  <Send size={18} />
-                  Envoyer la demande
+                <button type="submit" className="btn btn-primary btn-lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <><Loader2 size={18} className="spin" /> Envoi en cours...</>
+                  ) : (
+                    <><Send size={18} /> Envoyer la demande</>
+                  )}
                 </button>
               </div>
             </div>

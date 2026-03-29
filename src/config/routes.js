@@ -9,6 +9,10 @@ export const ROUTES = {
   CONTACT: '/contact',
   LEGAL: '/mentions-legales',
   CGV: '/cgv',
+  // Admin
+  ADMIN_LOGIN: '/admin',
+  ADMIN_BOOKINGS: '/admin/reservations',
+  ADMIN_CONTACTS: '/admin/messages',
 };
 
 export const NAV_LINKS = [
