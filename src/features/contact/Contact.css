@@ -1,0 +1,131 @@
+/* ============================================
+   CONTACT PAGE
+   ============================================ */
+
+.contact-page {
+  padding-top: calc(var(--header-height) + var(--space-12));
+  padding-bottom: var(--space-16);
+  min-height: 100vh;
+}
+
+.contact__header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.contact__header h1 {
+  margin-bottom: var(--space-4);
+}
+
+.contact__header .subtitle {
+  margin: 0 auto;
+}
+
+.contact__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--space-8);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Info */
+.contact__info-card {
+  background: var(--gradient-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  height: fit-content;
+}
+
+.contact__info-item {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.contact__info-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(201, 168, 76, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.contact__info-item h4 {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.contact__info-item p {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Form */
+.contact__form-wrap {
+  background: var(--gradient-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+}
+
+.contact__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.contact__form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.contact__form .btn {
+  align-self: flex-start;
+}
+
+/* Success */
+.contact__success {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+}
+
+.contact__success svg {
+  color: var(--color-success);
+  margin-bottom: var(--space-4);
+}
+
+.contact__success h3 {
+  margin-bottom: var(--space-3);
+}
+
+.contact__success p {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__form .btn {
+    align-self: stretch;
+  }
+}
