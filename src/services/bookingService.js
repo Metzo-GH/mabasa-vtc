@@ -86,15 +86,57 @@ export async function getBookings(statusFilter = null) {
 
 /**
  * Update booking status (admin only — requires auth).
+ * Now optionally accepts a price when moving status to "quoted".
  */
-export async function updateBookingStatus(id, status) {
+export async function updateBookingStatus(id, status, price = null) {
+  const updateData = { status };
+  if (price !== null) {
+    updateData.price = price;
+  }
+
   const { data, error } = await supabase
     .from('bookings')
-    .update({ status })
+    .update(updateData)
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw error;
+
+  // Trigger Edge Function si on envoie un Devis
+  if (status === 'quoted') {
+    try {
+      await supabase.functions.invoke('send-quote', {
+        body: { bookingData: data }
+      });
+    } catch (err) {
+      console.error('Erreur appel send-quote', err);
+    }
+  }
+
   return data;
+}
+
+/**
+ * Fetch a single booking (quote) anonymously using the secure RPC.
+ * Used by the client to review the price.
+ */
+export async function getQuoteById(id) {
+  const { data, error } = await supabase.rpc('get_quote_by_id', { b_id: id });
+  
+  if (error) throw error;
+  
+  // rpc always returns an array or null
+  if (!data || data.length === 0) return null;
+  return data[0]; 
+}
+
+/**
+ * Confirm a quote anonymously using the secure RPC.
+ * The RPC ensures status is 'quoted' before moving to 'confirmed'.
+ */
+export async function confirmQuote(id) {
+  const { error } = await supabase.rpc('confirm_quote', { b_id: id });
+  if (error) throw error;
+  return true;
 }

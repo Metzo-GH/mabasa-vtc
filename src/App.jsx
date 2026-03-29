@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './features/landing/Home';
 import Booking from './features/booking/Booking';
 import Contact from './features/contact/Contact';
+import QuotePage from './features/booking/QuotePage';
 import Legal from './features/legal/Legal';
 import AdminLogin from './features/admin/AdminLogin';
 import AdminLayout from './features/admin/AdminLayout';
@@ -34,6 +35,10 @@ export default function App() {
             element={<><Header /><Contact /><Footer /></>}
           />
           <Route
+            path={ROUTES.QUOTE}
+            element={<><Header /><QuotePage /><Footer /></>}
+          />
+          <Route
             path={ROUTES.LEGAL}
             element={<><Header /><Legal /><Footer /></>}
           />
@@ -41,6 +46,7 @@ export default function App() {
             path={ROUTES.CGV}
             element={<><Header /><Legal /><Footer /></>}
           />
+          <Route path="*" element={<Home />} />
 
           {/* Admin login — no Header/Footer */}
           <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />

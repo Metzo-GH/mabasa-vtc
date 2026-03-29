@@ -8,6 +8,7 @@ import './Admin.css';
 
 const STATUS_CONFIG = {
   pending: { label: 'En attente', color: '#f59e0b', icon: Clock },
+  quoted: { label: 'Devis envoyé', color: '#3b82f6', icon: CheckCircle },
   confirmed: { label: 'Confirmé', color: '#10b981', icon: CheckCircle },
   completed: { label: 'Terminé', color: '#6366f1', icon: CheckCircle },
   cancelled: { label: 'Annulé', color: '#ef4444', icon: XCircle },
@@ -16,6 +17,7 @@ const STATUS_CONFIG = {
 const STATUS_FILTERS = [
   { value: 'all', label: 'Toutes' },
   { value: 'pending', label: 'En attente' },
+  { value: 'quoted', label: 'Devis envoyé' },
   { value: 'confirmed', label: 'Confirmées' },
   { value: 'completed', label: 'Terminées' },
   { value: 'cancelled', label: 'Annulées' },
@@ -28,6 +30,7 @@ export default function BookingList() {
   const [filter, setFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [quotePrices, setQuotePrices] = useState({});
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -47,13 +50,16 @@ export default function BookingList() {
     fetchBookings();
   }, [fetchBookings]);
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  const handleStatusUpdate = async (id, newStatus, price = null) => {
     setUpdatingId(id);
     try {
-      const updated = await updateBookingStatus(id, newStatus);
+      const updated = await updateBookingStatus(id, newStatus, price);
       setBookings(prev =>
         prev.map(b => (b.id === id ? updated : b))
       );
+      if (newStatus === 'quoted') {
+        alert('Le devis a bien été envoyé au client par email !');
+      }
     } catch (err) {
       console.error('Status update error:', err);
       alert('Erreur lors de la mise à jour du statut.');
@@ -212,25 +218,40 @@ export default function BookingList() {
 
                     <div className="booking-card__actions">
                       {booking.status === 'pending' && (
-                        <>
+                        <div className="quote-form">
+                          <input 
+                            type="number" 
+                            placeholder="Prix proposé (€)" 
+                            className="form-input"
+                            value={quotePrices[booking.id] || ''}
+                            onChange={(e) => setQuotePrices({...quotePrices, [booking.id]: e.target.value})}
+                          />
                           <button
-                            className="btn btn-success btn-sm"
-                            onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
-                            disabled={isUpdating}
+                            className="btn btn-primary btn-sm"
+                            onClick={() => {
+                              if (!quotePrices[booking.id]) return alert("Veuillez saisir un prix");
+                              handleStatusUpdate(booking.id, 'quoted', quotePrices[booking.id]);
+                            }}
+                            disabled={isUpdating || !quotePrices[booking.id]}
                           >
-                            {isUpdating ? <Loader2 size={14} className="spin" /> : <CheckCircle size={14} />}
-                            Confirmer
+                            {isUpdating ? <Loader2 size={14} className="spin" /> : 'Envoyer le devis'}
                           </button>
                           <button
                             className="btn btn-danger btn-sm"
                             onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
                             disabled={isUpdating}
                           >
-                            <XCircle size={14} />
-                            Annuler
+                            <XCircle size={14} /> Annuler
                           </button>
-                        </>
+                        </div>
                       )}
+                      
+                      {booking.status === 'quoted' && (
+                        <span className="booking-card__final-status" style={{color: '#3b82f6'}}>
+                          <CheckCircle size={14} /> En attente validation client ({booking.price} €)
+                        </span>
+                      )}
+
                       {booking.status === 'confirmed' && (
                         <button
                           className="btn btn-primary btn-sm"

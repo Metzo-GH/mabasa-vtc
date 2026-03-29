@@ -7,6 +7,7 @@ export const ROUTES = {
   HOME: '/',
   BOOKING: '/reservation',
   CONTACT: '/contact',
+  QUOTE: '/devis/:id',
   LEGAL: '/mentions-legales',
   CGV: '/cgv',
   // Admin

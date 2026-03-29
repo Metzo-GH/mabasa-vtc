@@ -1,0 +1,198 @@
+.quote-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); /* Minus header approx */
+  background-color: var(--color-background);
+  padding: 2rem;
+}
+
+.quote-loading, .quote-error, .quote-success {
+  flex-direction: column;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.quote-loading p {
+  color: var(--color-gold);
+  font-weight: 500;
+}
+
+.quote-error h2 {
+  color: var(--color-text);
+}
+.quote-error p {
+  color: var(--color-text-muted);
+}
+
+.quote-success h1 {
+  color: #10b981;
+  margin: 1rem 0;
+}
+
+.quote-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.quote-header {
+  background-color: var(--color-background);
+  padding: 2rem;
+  border-bottom: 3px solid var(--color-gold);
+  text-align: center;
+}
+
+.quote-header h2 {
+  color: var(--color-gold);
+  margin-bottom: 0.5rem;
+}
+
+.quote-header p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+.quote-details {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.quote-route {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background-color: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.quote-pill {
+  background-color: var(--color-gold);
+  color: var(--color-background);
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quote-route-path {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.quote-route-path span {
+  color: var(--color-gold);
+}
+
+.quote-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background-color: var(--color-background);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.quote-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quote-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.quote-value {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.quote-price-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #0f172a;
+  border-radius: 8px;
+  border: 1px solid var(--color-gold);
+  text-align: center;
+}
+
+.quote-price-box span {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.quote-price-box strong {
+  color: var(--color-gold);
+  font-size: 2.5rem;
+}
+
+.quote-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border);
+}
+
+.quote-actions .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.quote-confirm-btn {
+  background-color: #10b981 !important; /* Green for success */
+  color: white !important;
+  border-color: #10b981 !important;
+}
+
+.quote-confirm-btn:hover {
+  background-color: #059669 !important;
+}
+
+@media (max-width: 600px) {
+  .quote-container {
+    padding: 1rem;
+  }
+  
+  .quote-info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quote-actions {
+    flex-direction: column;
+  }
+  
+  .quote-route-path {
+    font-size: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .quote-route-path span {
+    transform: rotate(90deg);
+  }
+}
