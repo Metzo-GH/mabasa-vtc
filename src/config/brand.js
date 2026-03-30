@@ -4,7 +4,7 @@
  */
 
 export const BRAND = {
-  name: 'MABASA TAXI VTC',
+  name: 'MABASA',
   tagline: 'Votre Chauffeur Privé dans les Alpes',
   description: 'Service de VTC premium dans les Hautes-Alpes. Transferts depuis et vers Courchevel, Val Thorens, Genève et toute la région alpine.',
   phone: '+33 6 17 76 95 97',
