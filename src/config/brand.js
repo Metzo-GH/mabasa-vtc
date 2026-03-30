@@ -6,7 +6,7 @@
 export const BRAND = {
   name: 'MABASA',
   tagline: 'Votre Chauffeur Privé dans les Alpes',
-  description: 'Service de VTC premium dans les Hautes-Alpes. Transferts depuis et vers Courchevel, Val Thorens, Genève et toute la région alpine.',
+  description: 'Service de VTC-Taxi premium dans les Hautes-Alpes. Transferts depuis et vers Courchevel, Val Thorens, Genève et toute la région alpine.',
   phone: '+33 6 17 76 95 97',
   email: 'ndiayebabacarba@gmail.com',
   whatsapp: '+33617769597',
