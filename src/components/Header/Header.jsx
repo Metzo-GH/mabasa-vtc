@@ -26,9 +26,9 @@ export default function Header() {
   return (
     <header className={`header ${isScrolled ? 'header--scrolled' : ''}`}>
       <div className="container header__inner">
-        <Link to={ROUTES.HOME} className="header__logo" aria-label="Accueil MABASA TAXI VTC">
+        <Link to={ROUTES.HOME} className="header__logo" aria-label="Accueil MABASA">
           <span className="header__logo-text">{BRAND.name}</span>
-          <span className="header__logo-sub">Chauffeur Premium</span>
+          <span className="header__logo-sub">TAXI VTC</span>
         </Link>
 
         <nav className={`header__nav ${isMenuOpen ? 'header__nav--open' : ''}`}>
