@@ -15,7 +15,7 @@ export default function AdminLogin() {
 
   // If already logged in, redirect to dashboard
   if (user) {
-    return <Navigate to={ROUTES.ADMIN_BOOKINGS} replace />;
+    return <Navigate to={ROUTES.ADMIN_DASHBOARD} replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -25,7 +25,7 @@ export default function AdminLogin() {
 
     try {
       await signIn(email, password);
-      navigate(ROUTES.ADMIN_BOOKINGS, { replace: true });
+      navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
       setError('Email ou mot de passe incorrect.');

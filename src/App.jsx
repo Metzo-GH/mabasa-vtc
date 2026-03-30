@@ -10,6 +10,7 @@ import QuotePage from './features/booking/QuotePage';
 import Legal from './features/legal/Legal';
 import AdminLogin from './features/admin/AdminLogin';
 import AdminLayout from './features/admin/AdminLayout';
+import Dashboard from './features/admin/Dashboard';
 import BookingList from './features/admin/BookingList';
 import ContactList from './features/admin/ContactList';
 import { ROUTES } from './config/routes';
@@ -59,6 +60,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
+            <Route path={ROUTES.ADMIN_DASHBOARD} element={<Dashboard />} />
             <Route path={ROUTES.ADMIN_BOOKINGS} element={<BookingList />} />
             <Route path={ROUTES.ADMIN_CONTACTS} element={<ContactList />} />
           </Route>

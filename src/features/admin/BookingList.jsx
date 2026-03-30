@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   CheckCircle, XCircle, Clock, Filter,
-  Loader2, AlertCircle, RefreshCw, ChevronDown, ChevronUp
+  Loader2, AlertCircle, RefreshCw, ChevronDown, ChevronUp,
+  Search, Trash2, Download, Calendar
 } from 'lucide-react';
-import { getBookings, updateBookingStatus } from '../../services/bookingService';
+import { getBookings, updateBookingStatus, deleteBooking } from '../../services/bookingService';
 import './Admin.css';
 
 const STATUS_CONFIG = {
@@ -23,13 +24,23 @@ const STATUS_FILTERS = [
   { value: 'cancelled', label: 'Annulées' },
 ];
 
+const DATE_FILTERS = [
+  { value: 'all', label: 'Tout' },
+  { value: 'today', label: "Aujourd'hui" },
+  { value: 'week', label: 'Cette semaine' },
+  { value: 'month', label: 'Ce mois' },
+];
+
 export default function BookingList() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [quotePrices, setQuotePrices] = useState({});
 
   const fetchBookings = useCallback(async () => {
@@ -50,6 +61,43 @@ export default function BookingList() {
     fetchBookings();
   }, [fetchBookings]);
 
+  // Client-side filtering: date + search
+  const filteredBookings = useMemo(() => {
+    let result = bookings;
+
+    // Date filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const startOfWeek = new Date(startOfDay);
+      startOfWeek.setDate(startOfDay.getDate() - startOfDay.getDay() + 1); // Monday
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      result = result.filter(b => {
+        const created = new Date(b.created_at);
+        if (dateFilter === 'today') return created >= startOfDay;
+        if (dateFilter === 'week') return created >= startOfWeek;
+        if (dateFilter === 'month') return created >= startOfMonth;
+        return true;
+      });
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(b =>
+        (b.first_name && b.first_name.toLowerCase().includes(q)) ||
+        (b.last_name && b.last_name.toLowerCase().includes(q)) ||
+        (b.email && b.email.toLowerCase().includes(q)) ||
+        (b.phone && b.phone.includes(q)) ||
+        (b.departure && b.departure.toLowerCase().includes(q)) ||
+        (b.arrival && b.arrival.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [bookings, dateFilter, searchQuery]);
+
   const handleStatusUpdate = async (id, newStatus, price = null) => {
     setUpdatingId(id);
     try {
@@ -68,6 +116,46 @@ export default function BookingList() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Supprimer définitivement cette réservation ? Cette action est irréversible.')) return;
+    setDeletingId(id);
+    try {
+      await deleteBooking(id);
+      setBookings(prev => prev.filter(b => b.id !== id));
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Erreur lors de la suppression.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = ['Date', 'Départ', 'Arrivée', 'Client', 'Email', 'Téléphone', 'Statut', 'Prix (€)'];
+    const rows = filteredBookings.map(b => [
+      new Date(b.created_at).toLocaleDateString('fr-FR'),
+      b.departure,
+      b.arrival,
+      `${b.first_name} ${b.last_name}`,
+      b.email,
+      b.phone,
+      STATUS_CONFIG[b.status]?.label || b.status,
+      b.price || '',
+    ]);
+
+    const csvContent = [headers, ...rows].map(row =>
+      row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')
+    ).join('\n');
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mabasa_reservations_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -77,7 +165,6 @@ export default function BookingList() {
   };
 
   const formatTime = (timeStr) => {
-    // Time comes as "HH:MM:SS" from Supabase, show "HH:MM"
     return timeStr ? timeStr.slice(0, 5) : '';
   };
 
@@ -92,25 +179,72 @@ export default function BookingList() {
             <span className="admin-page__badge">{pendingCount} en attente</span>
           )}
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={fetchBookings} disabled={loading}>
-          <RefreshCw size={16} className={loading ? 'spin' : ''} />
-          Actualiser
-        </button>
+        <div className="admin-header-actions">
+          <button className="btn btn-secondary btn-sm" onClick={exportCSV} title="Exporter en CSV">
+            <Download size={16} /> CSV
+          </button>
+          <button className="btn btn-secondary btn-sm" onClick={fetchBookings} disabled={loading}>
+            <RefreshCw size={16} className={loading ? 'spin' : ''} />
+            Actualiser
+          </button>
+        </div>
       </div>
 
-      {/* Filters */}
-      <div className="admin-filters">
-        <Filter size={16} />
-        {STATUS_FILTERS.map(f => (
-          <button
-            key={f.value}
-            className={`admin-filter-btn ${filter === f.value ? 'admin-filter-btn--active' : ''}`}
-            onClick={() => setFilter(f.value)}
-          >
-            {f.label}
+      {/* Search Bar */}
+      <div className="admin-search">
+        <Search size={18} />
+        <input
+          type="text"
+          placeholder="Rechercher par nom, email, téléphone, trajet..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="admin-search__input"
+        />
+        {searchQuery && (
+          <button className="admin-search__clear" onClick={() => setSearchQuery('')}>
+            <XCircle size={16} />
           </button>
-        ))}
+        )}
       </div>
+
+      {/* Filters Row */}
+      <div className="admin-filters-row">
+        {/* Status filter */}
+        <div className="admin-filters">
+          <Filter size={16} />
+          {STATUS_FILTERS.map(f => (
+            <button
+              key={f.value}
+              className={`admin-filter-btn ${filter === f.value ? 'admin-filter-btn--active' : ''}`}
+              onClick={() => setFilter(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Date filter */}
+        <div className="admin-filters">
+          <Calendar size={16} />
+          {DATE_FILTERS.map(f => (
+            <button
+              key={f.value}
+              className={`admin-filter-btn ${dateFilter === f.value ? 'admin-filter-btn--active' : ''}`}
+              onClick={() => setDateFilter(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Results count */}
+      {!loading && (
+        <div className="admin-results-count">
+          {filteredBookings.length} résultat{filteredBookings.length !== 1 ? 's' : ''}
+          {searchQuery && ` pour "${searchQuery}"`}
+        </div>
+      )}
 
       {/* Error */}
       {error && (
@@ -127,24 +261,25 @@ export default function BookingList() {
       )}
 
       {/* Empty state */}
-      {!loading && !error && bookings.length === 0 && (
+      {!loading && !error && filteredBookings.length === 0 && (
         <div className="admin-empty">
           <CalendarEmpty />
-          <p>Aucune réservation {filter !== 'all' ? `"${STATUS_FILTERS.find(f => f.value === filter)?.label}"` : ''}</p>
+          <p>Aucune réservation {filter !== 'all' ? `"${STATUS_FILTERS.find(f => f.value === filter)?.label}"` : ''} {searchQuery ? `pour "${searchQuery}"` : ''}</p>
         </div>
       )}
 
       {/* Booking cards */}
-      {!loading && bookings.length > 0 && (
+      {!loading && filteredBookings.length > 0 && (
         <div className="booking-cards">
-          {bookings.map(booking => {
+          {filteredBookings.map(booking => {
             const status = STATUS_CONFIG[booking.status] || { label: booking.status, color: '#666', icon: Clock };
             const StatusIcon = status.icon;
             const isExpanded = expandedId === booking.id;
             const isUpdating = updatingId === booking.id;
+            const isDeleting = deletingId === booking.id;
 
             return (
-              <div key={booking.id} className="booking-card">
+              <div key={booking.id} className={`booking-card ${isDeleting ? 'booking-card--deleting' : ''}`}>
                 <div
                   className="booking-card__header"
                   onClick={() => setExpandedId(isExpanded ? null : booking.id)}
@@ -165,6 +300,9 @@ export default function BookingList() {
                       <StatusIcon size={14} />
                       {status.label}
                     </span>
+                    {booking.price && (
+                      <span className="booking-card__price">{booking.price} €</span>
+                    )}
                     {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </div>
                 </div>
@@ -269,6 +407,16 @@ export default function BookingList() {
                           {status.label}
                         </span>
                       )}
+
+                      {/* Delete button — always visible */}
+                      <button
+                        className="btn btn-danger btn-sm booking-card__delete"
+                        onClick={() => handleDelete(booking.id)}
+                        disabled={isDeleting}
+                        title="Supprimer"
+                      >
+                        {isDeleting ? <Loader2 size={14} className="spin" /> : <Trash2 size={14} />}
+                      </button>
                     </div>
                   </div>
                 )}

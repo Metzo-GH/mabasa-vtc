@@ -138,3 +138,97 @@ export async function confirmQuote(id) {
   if (error) throw error;
   return true;
 }
+
+/**
+ * Delete a booking (admin only).
+ */
+export async function deleteBooking(id) {
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+  return true;
+}
+
+/**
+ * Get booking statistics for the admin dashboard.
+ */
+export async function getBookingStats() {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  // Courses ce mois
+  const thisMonth = data.filter(b => {
+    const d = new Date(b.created_at);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+
+  // CA total (confirmed + completed only)
+  const revenue = data
+    .filter(b => ['confirmed', 'completed'].includes(b.status) && b.price)
+    .reduce((sum, b) => sum + parseFloat(b.price), 0);
+
+  // CA ce mois
+  const revenueThisMonth = thisMonth
+    .filter(b => ['confirmed', 'completed'].includes(b.status) && b.price)
+    .reduce((sum, b) => sum + parseFloat(b.price), 0);
+
+  // En attente
+  const pending = data.filter(b => b.status === 'pending').length;
+
+  // Taux de confirmation
+  const total = data.length;
+  const confirmed = data.filter(b => ['confirmed', 'completed'].includes(b.status)).length;
+  const conversionRate = total > 0 ? Math.round((confirmed / total) * 100) : 0;
+
+  // Revenue par mois (6 derniers mois)
+  const monthlyRevenue = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(currentYear, currentMonth - i, 1);
+    const month = d.getMonth();
+    const year = d.getFullYear();
+    const monthData = data.filter(b => {
+      const bd = new Date(b.created_at);
+      return bd.getMonth() === month && bd.getFullYear() === year 
+        && ['confirmed', 'completed'].includes(b.status) && b.price;
+    });
+    const monthRev = monthData.reduce((sum, b) => sum + parseFloat(b.price), 0);
+    monthlyRevenue.push({
+      label: d.toLocaleDateString('fr-FR', { month: 'short' }),
+      revenue: monthRev,
+      count: monthData.length,
+    });
+  }
+
+  // Top trajets
+  const routeCounts = {};
+  data.forEach(b => {
+    const route = `${b.departure} → ${b.arrival}`;
+    routeCounts[route] = (routeCounts[route] || 0) + 1;
+  });
+  const topRoutes = Object.entries(routeCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([route, count]) => ({ route, count }));
+
+  return {
+    totalBookings: total,
+    thisMonthBookings: thisMonth.length,
+    revenue,
+    revenueThisMonth,
+    pending,
+    conversionRate,
+    monthlyRevenue,
+    topRoutes,
+  };
+}

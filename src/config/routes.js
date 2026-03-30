@@ -12,6 +12,7 @@ export const ROUTES = {
   CGV: '/cgv',
   // Admin
   ADMIN_LOGIN: '/admin',
+  ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_BOOKINGS: '/admin/reservations',
   ADMIN_CONTACTS: '/admin/messages',
 };
