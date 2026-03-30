@@ -153,6 +153,19 @@ export async function deleteBooking(id) {
 }
 
 /**
+ * Delete multiple bookings (admin only).
+ */
+export async function deleteBookings(ids) {
+  const { error } = await supabase
+    .from('bookings')
+    .delete()
+    .in('id', ids);
+
+  if (error) throw error;
+  return true;
+}
+
+/**
  * Get booking statistics for the admin dashboard.
  */
 export async function getBookingStats() {

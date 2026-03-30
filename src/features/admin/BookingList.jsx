@@ -4,7 +4,7 @@ import {
   Loader2, AlertCircle, RefreshCw, ChevronDown, ChevronUp,
   Search, Trash2, Download, Calendar
 } from 'lucide-react';
-import { getBookings, updateBookingStatus, deleteBooking } from '../../services/bookingService';
+import { getBookings, updateBookingStatus, deleteBooking, deleteBookings } from '../../services/bookingService';
 import './Admin.css';
 
 const STATUS_CONFIG = {
@@ -42,6 +42,8 @@ export default function BookingList() {
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [quotePrices, setQuotePrices] = useState({});
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -122,11 +124,50 @@ export default function BookingList() {
     try {
       await deleteBooking(id);
       setBookings(prev => prev.filter(b => b.id !== id));
+      // Nettoyer la sélection si nécessaire
+      const newSelected = new Set(selectedIds);
+      newSelected.delete(id);
+      setSelectedIds(newSelected);
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Erreur lors de la suppression.');
+      alert('Erreur lors de la suppression. Avez-vous activé la règle RLS "DELETE" sur Supabase ?');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedIds(new Set(filteredBookings.map(b => b.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id, checked) => {
+    const newSet = new Set(selectedIds);
+    if (checked) {
+      newSet.add(id);
+    } else {
+      newSet.delete(id);
+    }
+    setSelectedIds(newSet);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Supprimer définitivement les ${selectedIds.size} réservations sélectionnées ? Cette action est irréversible.`)) return;
+    
+    setIsDeletingBulk(true);
+    try {
+      await deleteBookings(Array.from(selectedIds));
+      setBookings(prev => prev.filter(b => !selectedIds.has(b.id)));
+      setSelectedIds(new Set());
+    } catch (err) {
+      console.error('Bulk delete error:', err);
+      alert('Erreur lors de la suppression groupée. Avez-vous activé la règle RLS "DELETE" sur Supabase ?');
+    } finally {
+      setIsDeletingBulk(false);
     }
   };
 
@@ -238,11 +279,39 @@ export default function BookingList() {
         </div>
       </div>
 
-      {/* Results count */}
+      {/* Results count & Bulk Actions */}
       {!loading && (
-        <div className="admin-results-count">
-          {filteredBookings.length} résultat{filteredBookings.length !== 1 ? 's' : ''}
-          {searchQuery && ` pour "${searchQuery}"`}
+        <div className="admin-results-header">
+          <div className="admin-results-count">
+            {filteredBookings.length} résultat{filteredBookings.length !== 1 ? 's' : ''}
+            {searchQuery && ` pour "${searchQuery}"`}
+          </div>
+          
+          {filteredBookings.length > 0 && (
+            <div className="admin-bulk-actions">
+              <label className="admin-checkbox-label">
+                <input 
+                  type="checkbox" 
+                  className="admin-checkbox"
+                  checked={filteredBookings.length > 0 && selectedIds.size === filteredBookings.length}
+                  onChange={handleSelectAll}
+                />
+                <span className="admin-checkbox-custom"></span>
+                Sélectionner tout
+              </label>
+
+              {selectedIds.size > 0 && (
+                <button 
+                  className="btn btn-danger btn-sm" 
+                  onClick={handleBulkDelete}
+                  disabled={isDeletingBulk}
+                >
+                  {isDeletingBulk ? <Loader2 size={14} className="spin" /> : <Trash2 size={14} />}
+                  Supprimer sélection ({selectedIds.size})
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -284,6 +353,15 @@ export default function BookingList() {
                   className="booking-card__header"
                   onClick={() => setExpandedId(isExpanded ? null : booking.id)}
                 >
+                  <label className="booking-card__select" onClick={e => e.stopPropagation()}>
+                    <input 
+                      type="checkbox" 
+                      className="admin-checkbox"
+                      checked={selectedIds.has(booking.id)}
+                      onChange={e => handleSelectOne(booking.id, e.target.checked)}
+                    />
+                    <span className="admin-checkbox-custom"></span>
+                  </label>
                   <div className="booking-card__route">
                     <strong>{booking.departure}</strong>
                     <span className="booking-card__arrow">→</span>
