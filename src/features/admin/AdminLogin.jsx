@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES } from '../../config/routes';
@@ -15,8 +15,7 @@ export default function AdminLogin() {
 
   // If already logged in, redirect to dashboard
   if (user) {
-    navigate(ROUTES.ADMIN_BOOKINGS, { replace: true });
-    return null;
+    return <Navigate to={ROUTES.ADMIN_BOOKINGS} replace />;
   }
 
   const handleSubmit = async (e) => {

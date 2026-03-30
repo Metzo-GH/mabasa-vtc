@@ -138,7 +138,7 @@ export default function BookingList() {
       {!loading && bookings.length > 0 && (
         <div className="booking-cards">
           {bookings.map(booking => {
-            const status = STATUS_CONFIG[booking.status];
+            const status = STATUS_CONFIG[booking.status] || { label: booking.status, color: '#666', icon: Clock };
             const StatusIcon = status.icon;
             const isExpanded = expandedId === booking.id;
             const isUpdating = updatingId === booking.id;
@@ -229,8 +229,9 @@ export default function BookingList() {
                           <button
                             className="btn btn-primary btn-sm"
                             onClick={() => {
-                              if (!quotePrices[booking.id]) return alert("Veuillez saisir un prix");
-                              handleStatusUpdate(booking.id, 'quoted', quotePrices[booking.id]);
+                              const priceValue = parseFloat(quotePrices[booking.id]);
+                              if (isNaN(priceValue) || priceValue <= 0) return alert("Le prix doit être un nombre positif");
+                              handleStatusUpdate(booking.id, 'quoted', priceValue);
                             }}
                             disabled={isUpdating || !quotePrices[booking.id]}
                           >

@@ -671,10 +671,13 @@
 @media (max-width: 768px) {
   .admin__sidebar {
     transform: translateX(-100%);
+    background: #0f172a; /* Fond solide opaque, jamais transparent */
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
   }
 
   .admin__sidebar--open {
     transform: translateX(0);
+    background: #0f172a; /* Force le fond opaque quand ouvert */
   }
 
   .admin__content {

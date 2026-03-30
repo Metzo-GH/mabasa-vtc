@@ -46,7 +46,7 @@ export default function App() {
             path={ROUTES.CGV}
             element={<><Header /><Legal /><Footer /></>}
           />
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<><Header /><Home /><Footer /></>} />
 
           {/* Admin login — no Header/Footer */}
           <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />

@@ -54,8 +54,6 @@ export async function createBooking(formData) {
 
     if (emailError) {
       console.error('Failed to send email:', emailError);
-    } else {
-      console.log('Email sent successfully:', emailData);
     }
   } catch (err) {
     console.error('Error invoking send-email function:', err);
@@ -91,7 +89,7 @@ export async function getBookings(statusFilter = null) {
 export async function updateBookingStatus(id, status, price = null) {
   const updateData = { status };
   if (price !== null) {
-    updateData.price = price;
+    updateData.price = parseFloat(price);
   }
 
   const { data, error } = await supabase

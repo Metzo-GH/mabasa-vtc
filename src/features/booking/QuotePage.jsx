@@ -71,7 +71,7 @@ export default function QuotePage() {
         <CheckCircle size={60} color="#10b981" />
         <h1>Réservation Confirmée !</h1>
         <p>Merci <strong>{quote?.first_name}</strong>. Votre trajet de <strong>{quote?.departure}</strong> vers <strong>{quote?.arrival}</strong> a bien été confirmé pour le prix de <strong>{quote?.price} €</strong>.</p>
-        <p>Le chauffeur sera au point de rendez-vous à <strong>{quote?.pickup_time.slice(0, 5)}</strong>.</p>
+        <p>Le chauffeur sera au point de rendez-vous à <strong>{quote?.pickup_time?.slice(0, 5)}</strong>.</p>
         <button className="btn btn-primary" onClick={() => navigate('/')}>
           Retour à l'accueil
         </button>
