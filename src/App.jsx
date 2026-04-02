@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import PublicLayout from './components/layout/PublicLayout';
 import Home from './features/landing/Home';
 import Booking from './features/booking/Booking';
 import Contact from './features/contact/Contact';
@@ -23,31 +22,15 @@ export default function App() {
         <ScrollToTop />
         <Routes>
           {/* Public pages — with Header & Footer */}
-          <Route
-            path={ROUTES.HOME}
-            element={<><Header /><Home /><Footer /></>}
-          />
-          <Route
-            path={ROUTES.BOOKING}
-            element={<><Header /><Booking /><Footer /></>}
-          />
-          <Route
-            path={ROUTES.CONTACT}
-            element={<><Header /><Contact /><Footer /></>}
-          />
-          <Route
-            path={ROUTES.QUOTE}
-            element={<><Header /><QuotePage /><Footer /></>}
-          />
-          <Route
-            path={ROUTES.LEGAL}
-            element={<><Header /><Legal /><Footer /></>}
-          />
-          <Route
-            path={ROUTES.CGV}
-            element={<><Header /><Legal /><Footer /></>}
-          />
-          <Route path="*" element={<><Header /><Home /><Footer /></>} />
+          <Route element={<PublicLayout />}>
+            <Route path={ROUTES.HOME} element={<Home />} />
+            <Route path={ROUTES.BOOKING} element={<Booking />} />
+            <Route path={ROUTES.CONTACT} element={<Contact />} />
+            <Route path={ROUTES.QUOTE} element={<QuotePage />} />
+            <Route path={ROUTES.LEGAL} element={<Legal />} />
+            <Route path={ROUTES.CGV} element={<Legal />} />
+            <Route path="*" element={<Home />} />
+          </Route>
 
           {/* Admin login — no Header/Footer */}
           <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />

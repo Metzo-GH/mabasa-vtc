@@ -16,12 +16,16 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 | Module | Statut | Détails |
 | :--- | :--- | :--- |
 | **Landing Page** | ✅ OK | Design premium, responsive. |
-| **Booking Flow** | ✅ OK | Multi-step form, insertion Supabase. |
+| **Booking Flow** | ✅ OK | Formulaire découpé SRP (Step1, Step2, Success). Insertion Supabase. |
 | **Auth Admin** | ✅ OK | Connexion sécurisée. |
 | **Dashboard Stats**| ✅ OK | KPIs et graphiques de base actifs. |
-| **Gestion Résas** | ✅ OK | Liste complète, filtres, tri date, et module Calendrier intégrés. |
+| **Gestion Résas** | ✅ OK | Refactorisation SOLID en cours (BookingCard extraite). |
 | **Export/Data**   | ✅ OK | Export CSV fonctionnel avec mapping RGPD. |
 | **Notifs Email**  | ✅ OK | Edge Functions connectées. |
+
+## 🏗️ ARCHITECTURE (RECENT)
+- **DRY** : Structure englobante `PublicLayout.jsx` pour les routes publiques.
+- **SRP** : Modules UI (Booking / Admin List) divisés en composants atomiques.
 
 ## 🚀 ROADMAP (EN COURS)
 1. **[LS]** Audit de sécurité & Performance (à venir).
