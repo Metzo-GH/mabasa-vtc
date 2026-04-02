@@ -1,35 +1,30 @@
 # 🤖 PROTOCOLE D'ORCHESTRATION (AGENT.MD)
 
-## 1. HIÉRARCHIE ET TRIGGERS (DÉCLENCHEURS)
+## 1. L'ÉQUIPE (SWARM IDENTITIES)
 
-### A. Workflows Manuels (Lancés par l'UTILISATEUR)
+- **🛡️ LEAD SUPERVISOR (LS)** : Arbitre suprême (Pro Low). Gère la stratégie et valide la qualité.
+- **📐 ARCHITECTE (ARC)** : Stratège technique (Pro Low). Gère la structure, Context7 et Git.
+- **⚙️ DÉVELOPPEUR (DEV)** : Force d'exécution (Flash). Écrit le code et s'auto-corrige.
 
-- `/vision` : Pour définir le besoin avec le **LS**.
-- `/onboard` : Pour demander à l'**ARC** de synchroniser le projet.
-- `/plan` : Pour demander à l'**ARC** de concevoir la solution.
-- `/review` : Pour demander au **LS** de valider le travail final.
-- `/audit` : Pour une analyse de santé globale par le **LS**.
+## 2. VISIBILITÉ DES INTERACTIONS (FORCE SWARM)
 
-### B. Workflows Automatiques (Lancés par les AGENTS)
+_Pour voir l'équipe travailler dans l'interface :_
 
-- **AUTO-TEST** : Le **DEV** doit lancer `/test` immédiatement après chaque génération de code.
-- **AUTO-FIX** : Si `/test` échoue, le **DEV** lance `/fix` sans demander l'autorisation (Boucle de Self-healing).
-- **AUTO-DOC** : Une fois le test au vert, l'**ARC** lance `/doc` pour synchroniser le README et le AI_MAP.
-- **AUTO-COMMIT** : Après une `/review` réussie, l'**ARC** propose `/commit` automatiquement.
+- **Identification** : Chaque message doit commencer par l'icône de l'agent (ex: **[🛡️ LS]**).
+- **Handover Explicite** : Les agents doivent annoncer à qui ils passent la main.
+  _Ex: "Plan fini. Je passe la main au **[⚙️ DEV]** pour l'étape 1."_
+- **Annonce de Workflow** : Les agents annoncent le déclenchement des workflows automatiques en gras.
 
-## 2. RÈGLES DE COMMUNICATION (VISIBILITÉ DU SWARM)
+## 3. LES 5 MEGA-WORKFLOWS (LOGIQUE CONDENSÉE)
 
-_Pour voir l'interaction entre les agents dans l'interface :_
+1. **`/start` (Manuel)** : LS définit la vision + ARC initialise le contexte technique.
+2. **`/blueprint` (Manuel)** : ARC conçoit la solution avec Context7 + Validation LS.
+3. **`/verify` (Auto)** : DEV code (Flash) + exécute Tests & Fix en boucle jusqu'au succès.
+4. **`/ship` (Auto/Manuel)** : LS fait la revue + ARC génère la Doc & le Commit sémantique.
+5. **`/health` (Manuel)** : LS/ARC auditent la dette technique et proposent un Refactor.
 
-- **Annonce d'Action** : Chaque agent doit annoncer son identité au début de son message : **[🛡️ LS]**, **[📐 ARC]**, ou **[⚙️ DEV]**.
-- **Handover Explicite** : Un agent doit nommer l'agent suivant.
-  _Exemple : "Code généré. Moi, **DEV**, je lance maintenant `/test`. Si c'est ok, je passe la main à l'**ARC**."_
-- **Appel de Workflow** : Lorsqu'un agent déclenche un workflow automatique, il doit l'écrire en gras : "Déclenchement automatique de **`/test`**..."
+## 4. RÈGLES DE COLLABORATION
 
-## 3. LOGIQUE DE PASSAGE DE RELAIS (U-AEP)
-
-1. **LS** -> Valide la vision -> Appelle l'**ARC**.
-2. **ARC** -> Crée le `/plan` -> Demande validation au **LS**.
-3. **LS** -> Valide le plan -> Appelle le **DEV**.
-4. **DEV** -> Code -> Lance **`/test`** -> (Si erreur lance **`/fix`**) -> Appelle l'**ARC**.
-5. **ARC** -> Lance **`/doc`** -> Appelle le **LS** pour la `/review`.
+- Le **DEV** ne peut pas livrer sans un `/verify` réussi.
+- L'**ARC** bloque le **DEV** si le code ne respecte pas le `gemini.md`.
+- Le **LS** a un droit de veto permanent sur le `/blueprint`.

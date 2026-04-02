@@ -18,19 +18,19 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 | **Landing Page** | ✅ OK | Design premium, responsive. |
 | **Booking Flow** | ✅ OK | Formulaire découpé SRP (Step1, Step2, Success). Insertion Supabase. |
 | **Auth Admin** | ✅ OK | Connexion sécurisée. |
-| **Dashboard Stats**| ✅ OK | KPIs et graphiques de base actifs. |
-| **Gestion Résas** | ✅ OK | Refactorisation SOLID en cours (BookingCard extraite). |
+| **Dashboard Stats**| ✅ OK | KPIs gérés par Supabase RPC (100% Scalable). |
+| **Gestion Résas** | ✅ OK | Refactorisation modulaire (Filtres, API séparés dans `useBookings.js`). |
 | **Export/Data**   | ✅ OK | Export CSV fonctionnel avec mapping RGPD. |
 | **Notifs Email**  | ✅ OK | Edge Functions connectées. |
 
 ## 🏗️ ARCHITECTURE (RECENT)
-- **DRY** : Structure englobante `PublicLayout.jsx` pour les routes publiques.
-- **SRP** : Modules UI (Booking / Admin List) divisés en composants atomiques.
+- **SOLID / DRY** : Refactoring UI Admin réussi (`DashboardKPIs`, `BookingFilters`).
+- **Data Layer** : Supabase RPC `get_dashboard_stats` implantée.
 
 ## 🚀 ROADMAP (EN COURS)
-1. **[LS]** Audit de sécurité & Performance (à venir).
-2. **[PO]** Déploiement et tests grandeur nature sur Vercel/Supabase Prod.
-3. **[DEV]** Intégration domaine custom (Optionnel).
+1. **[PO/LS]** Poussée en Production (Vercel) effectuée. ✅
+2. **[LS]** Audit Sécurité RLS et Edge Functions (Optionnel post-déploiement).
+3. **[DEV]** Intégration de domaine custom (Optionnel).
 
 ## 📜 CONVENTIONS DE CODE
 - **Tests** : 1 test par fonction (Vitest/Jest).

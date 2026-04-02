@@ -169,79 +169,38 @@ export async function deleteBookings(ids) {
  * Get booking statistics for the admin dashboard.
  */
 export async function getBookingStats() {
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+  const { data, error } = await supabase.rpc('get_dashboard_stats');
   if (error) throw error;
 
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
-
-  // Courses ce mois
-  const thisMonth = data.filter(b => {
-    const d = new Date(b.created_at);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
-
-  // CA total (confirmed + completed only)
-  const revenue = data
-    .filter(b => ['confirmed', 'completed'].includes(b.status) && b.price)
-    .reduce((sum, b) => sum + parseFloat(b.price), 0);
-
-  // CA ce mois
-  const revenueThisMonth = thisMonth
-    .filter(b => ['confirmed', 'completed'].includes(b.status) && b.price)
-    .reduce((sum, b) => sum + parseFloat(b.price), 0);
-
-  // En attente
-  const pending = data.filter(b => b.status === 'pending').length;
-
-  // Taux de confirmation
-  const total = data.length;
-  const confirmed = data.filter(b => ['confirmed', 'completed'].includes(b.status)).length;
-  const conversionRate = total > 0 ? Math.round((confirmed / total) * 100) : 0;
-
-  // Revenue par mois (6 derniers mois)
   const monthlyRevenue = [];
+
   for (let i = 5; i >= 0; i--) {
     const d = new Date(currentYear, currentMonth - i, 1);
-    const month = d.getMonth();
-    const year = d.getFullYear();
-    const monthData = data.filter(b => {
-      const bd = new Date(b.created_at);
-      return bd.getMonth() === month && bd.getFullYear() === year 
-        && ['confirmed', 'completed'].includes(b.status) && b.price;
-    });
-    const monthRev = monthData.reduce((sum, b) => sum + parseFloat(b.price), 0);
+    // On met au format YYYY-MM
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const monthStr = `${yyyy}-${mm}`;
+    
+    const found = data.monthlyData.find(item => item.month_val && item.month_val.startsWith(monthStr));
+    
     monthlyRevenue.push({
       label: d.toLocaleDateString('fr-FR', { month: 'short' }),
-      revenue: monthRev,
-      count: monthData.length,
+      revenue: found ? parseFloat(found.revenue) : 0,
+      count: found ? found.count : 0,
     });
   }
 
-  // Top trajets
-  const routeCounts = {};
-  data.forEach(b => {
-    const route = `${b.departure} → ${b.arrival}`;
-    routeCounts[route] = (routeCounts[route] || 0) + 1;
-  });
-  const topRoutes = Object.entries(routeCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([route, count]) => ({ route, count }));
-
   return {
-    totalBookings: total,
-    thisMonthBookings: thisMonth.length,
-    revenue,
-    revenueThisMonth,
-    pending,
-    conversionRate,
+    totalBookings: data.totalBookings,
+    thisMonthBookings: data.thisMonthBookings,
+    revenue: parseFloat(data.revenue),
+    revenueThisMonth: parseFloat(data.revenueThisMonth),
+    pending: data.pending,
+    conversionRate: data.conversionRate,
     monthlyRevenue,
-    topRoutes,
+    topRoutes: data.topRoutes,
   };
 }
