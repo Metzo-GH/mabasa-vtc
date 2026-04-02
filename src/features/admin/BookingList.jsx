@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   CheckCircle, XCircle, Clock, Filter,
   Loader2, AlertCircle, RefreshCw, ChevronDown, ChevronUp,
-  Search, Trash2, Download, Calendar
+  Search, Trash2, Download, Calendar, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { getBookings, updateBookingStatus, deleteBooking, deleteBookings } from '../../services/bookingService';
+import CalendarView from './CalendarView';
 import './Admin.css';
 
 const STATUS_CONFIG = {
@@ -38,6 +39,8 @@ export default function BookingList() {
   const [filter, setFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [viewMode, setViewMode] = useState('list');
   const [expandedId, setExpandedId] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -97,8 +100,15 @@ export default function BookingList() {
       );
     }
 
+    // Sorting
+    result = [...result].sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
     return result;
-  }, [bookings, dateFilter, searchQuery]);
+  }, [bookings, dateFilter, searchQuery, sortOrder]);
 
   const handleStatusUpdate = async (id, newStatus, price = null) => {
     setUpdatingId(id);
@@ -231,6 +241,34 @@ export default function BookingList() {
         </div>
       </div>
 
+      {/* View Toggle */}
+      <div className="admin-view-toggle" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+        <button 
+          className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setViewMode('list')}
+        >
+          Vue Liste
+        </button>
+        <button 
+          className={`btn btn-sm ${viewMode === 'calendar' ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setViewMode('calendar')}
+        >
+          Vue Calendrier
+        </button>
+      </div>
+
+      {viewMode === 'calendar' && (
+        <CalendarView 
+          bookings={bookings} 
+          onSelectDate={(date) => {
+            setDateFilter('all');
+            setSearchQuery(date);
+            setViewMode('list');
+          }}
+        />
+      )}
+
+      <div style={{ display: viewMode === 'list' ? 'block' : 'none' }}>
       {/* Search Bar */}
       <div className="admin-search">
         <Search size={18} />
@@ -282,9 +320,20 @@ export default function BookingList() {
       {/* Results count & Bulk Actions */}
       {!loading && (
         <div className="admin-results-header">
-          <div className="admin-results-count">
-            {filteredBookings.length} résultat{filteredBookings.length !== 1 ? 's' : ''}
-            {searchQuery && ` pour "${searchQuery}"`}
+          <div className="admin-results-count" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span>
+              {filteredBookings.length} résultat{filteredBookings.length !== 1 ? 's' : ''}
+              {searchQuery && ` pour "${searchQuery}"`}
+            </span>
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={() => setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+              title="Trier par date de commande"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            >
+              {sortOrder === 'desc' ? <ArrowDown size={14} /> : <ArrowUp size={14} />} 
+              {sortOrder === 'desc' ? 'Plus récentes' : 'Plus anciennes'}
+            </button>
           </div>
           
           {filteredBookings.length > 0 && (
@@ -503,6 +552,7 @@ export default function BookingList() {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }
