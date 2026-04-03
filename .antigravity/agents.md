@@ -1,30 +1,17 @@
-# 🤖 PROTOCOLE D'ORCHESTRATION (AGENT.MD)
+# 🤖 ORCHESTRATION DU SWARM (AGENT.MD)
 
-## 1. L'ÉQUIPE (SWARM IDENTITIES)
+## 1. IDENTITÉ ET VISIBILITÉ
 
-- **🛡️ LEAD SUPERVISOR (LS)** : Arbitre suprême (Pro Low). Gère la stratégie et valide la qualité.
-- **📐 ARCHITECTE (ARC)** : Stratège technique (Pro Low). Gère la structure, Context7 et Git.
-- **⚙️ DÉVELOPPEUR (DEV)** : Force d'exécution (Flash). Écrit le code et s'auto-corrige.
+- **Identification** : Chaque message commence par : **[🛡️ LS]**, **[📐 ARC]**, ou **[⚙️ DEV]**.
+- **Handover** : L'agent doit nommer le suivant. Ex: "Je passe la main au **[⚙️ DEV]**".
 
-## 2. VISIBILITÉ DES INTERACTIONS (FORCE SWARM)
+## 2. AUTOMATISATION (SANS INTERVENTION)
 
-_Pour voir l'équipe travailler dans l'interface :_
+- **Trigger `/verify`** : Le DEV lance ce workflow immédiatement après avoir codé.
+- **Trigger `/ship`** : L'ARC prend la main dès que les tests sont au vert (100%).
+- **Tranche de décision** : L'utilisateur n'intervient que pour `/start`, `/blueprint` et `/health`.
 
-- **Identification** : Chaque message doit commencer par l'icône de l'agent (ex: **[🛡️ LS]**).
-- **Handover Explicite** : Les agents doivent annoncer à qui ils passent la main.
-  _Ex: "Plan fini. Je passe la main au **[⚙️ DEV]** pour l'étape 1."_
-- **Annonce de Workflow** : Les agents annoncent le déclenchement des workflows automatiques en gras.
+## 3. PROTECTION QUOTA & CONTEXTE
 
-## 3. LES 5 MEGA-WORKFLOWS (LOGIQUE CONDENSÉE)
-
-1. **`/start` (Manuel)** : LS définit la vision + ARC initialise le contexte technique.
-2. **`/blueprint` (Manuel)** : ARC conçoit la solution avec Context7 + Validation LS.
-3. **`/verify` (Auto)** : DEV code (Flash) + exécute Tests & Fix en boucle jusqu'au succès.
-4. **`/ship` (Auto/Manuel)** : LS fait la revue + ARC génère la Doc & le Commit sémantique.
-5. **`/health` (Manuel)** : LS/ARC auditent la dette technique et proposent un Refactor.
-
-## 4. RÈGLES DE COLLABORATION
-
-- Le **DEV** ne peut pas livrer sans un `/verify` réussi.
-- L'**ARC** bloque le **DEV** si le code ne respecte pas le `gemini.md`.
-- Le **LS** a un droit de veto permanent sur le `/blueprint`.
+- **Délégation** : Le LS ne scanne jamais le code brut. Il utilise le résumé de l'ARC.
+- **Sélectivité** : Utiliser `@file` pour cibler les fichiers, jamais le `@workspace` entier inutilement.

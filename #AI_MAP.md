@@ -16,16 +16,18 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 | Module | Statut | Détails |
 | :--- | :--- | :--- |
 | **Landing Page** | ✅ OK | Design premium, responsive. |
-| **Booking Flow** | ✅ OK | Formulaire découpé SRP (Step1, Step2, Success). Insertion Supabase. |
+| **Booking Flow** | ✅ OK | Refactorisation SOLID (Step1, Step2, Success). Logique dans `useBookingForm.js`. |
 | **Auth Admin** | ✅ OK | Connexion sécurisée. |
 | **Dashboard Stats**| ✅ OK | KPIs gérés par Supabase RPC (100% Scalable). |
-| **Gestion Résas** | ✅ OK | Refactorisation modulaire (Filtres, API séparés dans `useBookings.js`). |
+| **Gestion Résas** | ✅ OK | Refactorisation modulaire (Filtres, API séparés). |
 | **Export/Data**   | ✅ OK | Export CSV fonctionnel avec mapping RGPD. |
 | **Notifs Email**  | ✅ OK | Edge Functions connectées. |
+| **Tests/Qualité** | ✅ OK | Vitest implanté. 1 test par fonction (Logique Validation). |
 
 ## 🏗️ ARCHITECTURE (RECENT)
-- **SOLID / DRY** : Refactoring UI Admin réussi (`DashboardKPIs`, `BookingFilters`).
+- **SOLID / DRY** : Refactoring `Booking.jsx` via `useBookingForm` et validation externalisée.
 - **Data Layer** : Supabase RPC `get_dashboard_stats` implantée.
+- **Test Suite** : Vitest configuré dans `vite.config.js`.
 
 ## 🚀 ROADMAP (EN COURS)
 1. **[PO/LS]** Poussée en Production (Vercel) effectuée. ✅
