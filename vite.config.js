@@ -9,5 +9,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
+    watch: false,
+    pool: 'threads',
+    poolOptions: { threads: { isolate: false } },
   },
 })

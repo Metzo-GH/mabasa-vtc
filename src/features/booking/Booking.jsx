@@ -3,24 +3,9 @@ import BookingStep2 from './components/BookingStep2';
 import BookingSuccess from './components/BookingSuccess';
 import { useBookingForm } from '../../hooks/useBookingForm';
 import './Booking.css';
+import { INITIAL_FORM } from './utils/bookingConstants';
 
-const INITIAL_FORM = {
-  tripType: 'oneway',
-  departure: '',
-  arrival: '',
-  date: '',
-  time: '',
-  returnDate: '',
-  returnTime: '',
-  passengers: '1',
-  luggage: '1',
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  flightNumber: '',
-  notes: '',
-};
+
 
 export default function Booking() {
   const {

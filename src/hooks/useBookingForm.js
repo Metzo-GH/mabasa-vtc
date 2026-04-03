@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createBooking } from '../services/bookingService';
-import { validateStep1, validateStep2 } from '../features/booking/utils/bookingValidation';
+import { validateStep1, validateStep2, sanitizeBookingData } from '../features/booking/utils/bookingValidation';
 
 /**
  * Custom hook to manage the booking form state and logic.
@@ -44,7 +44,8 @@ export function useBookingForm(initialForm) {
     setSubmitError(null);
 
     try {
-      await createBooking(form);
+      const sanitizedPayload = sanitizeBookingData(form);
+      await createBooking(sanitizedPayload);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {

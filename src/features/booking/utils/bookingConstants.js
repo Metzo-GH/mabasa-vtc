@@ -1,0 +1,17 @@
+export const INITIAL_FORM = {
+  tripType: 'oneway',
+  departure: '',
+  arrival: '',
+  date: '',
+  time: '',
+  returnDate: '',
+  returnTime: '',
+  passengers: '1',
+  luggage: '1',
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  flightNumber: '',
+  notes: '',
+};

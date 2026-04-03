@@ -27,3 +27,29 @@ export const validateStep2 = (form) => {
   
   return errors;
 };
+
+/**
+ * Assainissement des champs textes (OWASP XSS mitigation)
+ */
+export const sanitizeBookingData = (data) => {
+  const sanitized = { ...data };
+  const escapeString = (str) => {
+    if (typeof str !== 'string') return str;
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag])
+    );
+  };
+
+  // Assainir tous les champs de type string
+  Object.keys(sanitized).forEach(key => {
+    sanitized[key] = escapeString(sanitized[key]);
+  });
+  
+  return sanitized;
+};
