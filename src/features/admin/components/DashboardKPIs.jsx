@@ -1,4 +1,4 @@
-import { TrendingUp, CarProvider, CalendarCheck, BarChart3, MapPin, MapPinOff } from 'lucide-react';
+import { MapPin, MapPinOff } from 'lucide-react';
 
 export default function DashboardKPIs({ stats }) {
   if (!stats) return null;
