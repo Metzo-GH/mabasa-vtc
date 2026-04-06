@@ -1,36 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
-import { getBookingStats } from '../../services/bookingService';
+import useDashboardStats from './hooks/useDashboardStats';
 import DashboardKPIs from './components/DashboardKPIs';
 import DashboardCharts from './components/DashboardCharts';
+import DashboardUpcomingBookings from './components/DashboardUpcomingBookings';
+import DashboardRecentPayments from './components/DashboardRecentPayments';
 import './Admin.css';
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const today = new Date();
+  const currentMonthStr = String(today.getMonth() + 1).padStart(2, '0');
+  const currentYearStr = String(today.getFullYear());
 
-  const fetchStats = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getBookingStats();
-      setStats(data);
-    } catch (err) {
-      console.error('Stats fetch error:', err);
-      setError('Impossible de charger les statistiques.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+  const [selectedYear, setSelectedYear] = useState(currentYearStr);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  const { bookings, stats, loading, error, refetch } = useDashboardStats(selectedMonth, selectedYear);
 
-  if (loading) {
+  if (loading && !stats) {
     return (
-      <div className="admin-page">
+      <div className="admin-page admin-dark-theme">
         <div className="admin-loading"><Loader2 size={32} className="spin" /></div>
       </div>
     );
@@ -38,44 +27,71 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="admin-page">
+      <div className="admin-page admin-dark-theme">
         <div className="admin-error"><AlertCircle size={16} /> {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="admin-page">
-      <div className="admin-page__header">
+    <div className="admin-page admin-dark-theme">
+      {/* Header Premium */}
+      <div className="admin-page__header premium-header">
         <div>
-          <h1>Tableau de bord</h1>
-          <span className="dash-subtitle">Vue d'ensemble de votre activité</span>
+          <h1>Bonjour,</h1>
+          <span className="dash-subtitle">
+            {today.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </span>
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={fetchStats}>
-          <RefreshCw size={16} /> Actualiser
-        </button>
+        
+        {/* Filtres de temps */}
+        <div className="dash-filters glass-panel">
+          <select 
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">Tous les mois</option>
+            <option value="01">Janvier</option>
+            <option value="02">Février</option>
+            <option value="03">Mars</option>
+            <option value="04">Avril</option>
+            <option value="05">Mai</option>
+            <option value="06">Juin</option>
+            <option value="07">Juillet</option>
+            <option value="08">Août</option>
+            <option value="09">Septembre</option>
+            <option value="10">Octobre</option>
+            <option value="11">Novembre</option>
+            <option value="12">Décembre</option>
+          </select>
+          <select 
+            value={selectedYear} 
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="filter-select"
+          >
+            <option value="all">Toutes les années</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+
+          <button className="btn btn-icon btn-refresh" onClick={refetch} title="Actualiser">
+            <RefreshCw size={16} />
+          </button>
+        </div>
       </div>
 
       <DashboardKPIs stats={stats} />
-      <DashboardCharts stats={stats} />
-
-      {/* Global Stats */}
-      <div className="dash-panel dash-panel--footer">
-        <div className="dash-footer-stats">
-          <div>
-            <span>Total courses</span>
-            <strong>{stats.totalBookings}</strong>
-          </div>
-          <div>
-            <span>CA total</span>
-            <strong>{stats.revenue.toFixed(0)} €</strong>
-          </div>
-          <div>
-            <span>Confirmées</span>
-            <strong>{stats.conversionRate}%</strong>
-          </div>
-        </div>
+      
+      {/* Listes récentes */}
+      <div className="dash-grid-lists">
+        <DashboardUpcomingBookings bookings={stats?.rawBookings} />
+        <DashboardRecentPayments bookings={stats?.rawBookings} />
       </div>
+
+      {/* Graphiques */}
+      <DashboardCharts stats={stats} />
     </div>
   );
 }

@@ -18,7 +18,7 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 | **Landing Page** | ✅ OK | Design premium, responsive. |
 | **Booking Flow** | ✅ OK | Refactorisation SOLID (Step1, Step2, Success). Logique dans `useBookingForm.js`. |
 | **Auth Admin** | ✅ OK | Connexion sécurisée. |
-| **Dashboard Stats**| ✅ OK | KPIs gérés par Supabase RPC (100% Scalable). |
+| **Dashboard Stats**| ✅ OK | Refont UI (Dark Premium) + Logique de filtrage locale via `useDashboardStats.js`. |
 | **Gestion Résas** | ✅ OK | Refactorisation modulaire (Filtres, API séparés). |
 | **Export/Data**   | ✅ OK | Export CSV fonctionnel avec mapping RGPD. |
 | **Notifs Email**  | ✅ OK | Edge Functions connectées. |
@@ -34,6 +34,7 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 1. **[PO/LS]** Poussée en Production (Vercel) effectuée. ✅
 2. **[LS]** Audit Sécurité RLS et Edge Functions (Optionnel post-déploiement).
 3. **[DEV]** Intégration de domaine custom (Optionnel).
+4. **[ARC]** Refonte UI/UX Dashboard Admin (Dark Mode Premium) effectuée. ✅
 
 ## 📜 CONVENTIONS DE CODE
 - **Tests** : 1 test par fonction (Vitest/Jest).

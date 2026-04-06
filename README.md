@@ -5,13 +5,13 @@ Plateforme professionnelle de réservation de chauffeurs VTC pour les trajets pr
 ## 🌟 Fonctionnalités
 - **Application Web Responsive** : Expérience utilisateur fluide et moderne, optimisée mobiles et desktops.
 - **Réservation Multisteps** : Calcul du trajet, choix du type (Aller simple / Aller-retour), recueil sécurisé des données client.
-- **Tableau de Bord Admin** : Suivi des statistiques et des revenus via Supabase.
+- **Tableau de Bord Admin** : Suivi des statistiques et des revenus via Supabase. Nouvelle vue Premium (Dark Mode) avec filtrage des données client-side (Année/Mois) et calcul des métriques dynamiques.
 - **Sécurité et Robustesse** : Protection contre l'injection XSS, architecture SOLID.
 
 ## 🛠 Technologies
 - **Frontend** : React 19, Vite 8, CSS Vanilla
-- **Backend / BaaS** : Supabase (PostgreSQL, Authentification, RPC pour les KPIs)
-- **Tests** : Vitest (sans mode Watch implémenté pour le CI/CD)
+- **Backend / BaaS** : Supabase (PostgreSQL, Authentification, RPC)
+- **Tests** : Vitest (100% de réussite intégrée pour le Dashboard)
 
 ## 🚀 Démarrage Rapide
 

@@ -1,0 +1,36 @@
+ DEPRECATED  `test.poolOptions` was removed in Vitest 4. All previous `poolOptions` are now top-level options. Please, refer to the migration guide: https://vitest.dev/guide/migration#pool-rework
+
+[1m[46m RUN [49m[22m [36mv4.1.2 [39m[90mC:/Users/Metzo/.gemini/antigravity/scratch[39m
+
+ [31mÔØ»[39m src/features/admin/hooks/__tests__/useDashboardStats.test.js [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 265[2mms[22m[39m
+[31m     [31m├ù[31m devrait calculer les stats correctement pour le filtrage par d├®faut[39m[32m 97[2mms[22m[39m
+     [32mÔ£ô[39m devrait filtrer par ann├®e[32m 85[2mms[22m[39m
+     [32mÔ£ô[39m devrait identifier les trajets populaires[32m 79[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 1 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  src/features/admin/hooks/__tests__/useDashboardStats.test.js > useDashboardStats > devrait calculer les stats correctement pour le filtrage par d├®faut
+AssertionError: expected 100 to be 150 // Object.is equality
+
+- Expected
++ Received
+
+- 150
++ 100
+
+ ÔØ» src/features/admin/hooks/__tests__/useDashboardStats.test.js:47:42
+     45|     expect(result.current.stats.totalBookings).toBe(2);
+     46|     expect(result.current.stats.pending).toBe(1);
+     47|     expect(result.current.stats.revenue).toBe(150); // Somme de tous lÔÇª
+       |                                          ^
+     48|   });
+     49|
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (3)[39m
+[2m   Start at [22m 10:09:22
+[2m   Duration [22m 2.61s[2m (transform 70ms, setup 315ms, import 69ms, tests 265ms, environment 1.67s)[22m
+
