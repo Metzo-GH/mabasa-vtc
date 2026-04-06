@@ -17,8 +17,9 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
         <AlertCircle size={16} />
         <p>
           <strong>Note professionnelle :</strong> Pour garantir la qualité de notre service, 
-          chaque trajet doit impérativement avoir ses <strong>Hautes-Alpes (05)</strong> 
-          comme point de <strong>départ</strong> ou de <strong>destination</strong>.
+          chaque trajet doit impérativement avoir les <strong>Hautes-Alpes (05)</strong> 
+          ou la région <strong>Auvergne-Rhône-Alpes</strong> comme point de 
+          <strong>départ</strong> ou de <strong>destination</strong>.
         </p>
       </div>
 

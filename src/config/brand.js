@@ -31,7 +31,7 @@ export const ZONES = {
     'Gare de Moutiers',
     'Gare d\'Albertville',
   ],
-  rule: 'Les Hautes-Alpes doivent être le point de départ ou d\'arrivée.',
+  rule: 'Le départ ou l\'arrivée doit s\'effectuer dans les Hautes-Alpes (05) ou en région Auvergne-Rhône-Alpes.',
 };
 
 export const SERVICES = [

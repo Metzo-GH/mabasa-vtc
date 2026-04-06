@@ -18,23 +18,24 @@ describe('Booking Validation Utils', () => {
       expect(errors.time).toBeDefined();
     });
 
-    it('should return errors if neither departure nor arrival is in 05', () => {
+    it('should return errors if neither departure nor arrival is in 05 or ARA', () => {
       const form = {
         departure: { label: 'Paris', city: 'Paris', postcode: '75000', context: '75, Paris' },
-        arrival: { label: 'Lyon', city: 'Lyon', postcode: '69000', context: '69, Lyon' },
+        arrival: { label: 'Marseille', city: 'Marseille', postcode: '13000', context: '13, Bouches-du-Rhône' },
         date: '2026-05-01',
         time: '10:00',
         tripType: 'oneway'
       };
       const errors = validateStep1(form);
-      expect(errors.departure).toBe('Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05)');
-      expect(errors.arrival).toBe('Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05)');
+      const expectedError = 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05) ou en Auvergne-Rhône-Alpes';
+      expect(errors.departure).toBe(expectedError);
+      expect(errors.arrival).toBe(expectedError);
     });
 
-    it('should return no errors if departure is in 05', () => {
+    it('should return no errors if departure is in ARA (e.g., Courchevel 73)', () => {
       const form = {
-        departure: { label: 'Gap', city: 'Gap', postcode: '05000', context: '05, Hautes-Alpes' },
-        arrival: { label: 'Lyon', city: 'Lyon', postcode: '69000', context: '69, Lyon' },
+        departure: { label: 'Courchevel', city: 'Courchevel', postcode: '73120', context: '73, Savoie' },
+        arrival: { label: 'Genève', city: 'Genève', postcode: '1215', context: 'Genève (Suisse)' },
         date: '2026-05-01',
         time: '10:00',
         tripType: 'oneway'

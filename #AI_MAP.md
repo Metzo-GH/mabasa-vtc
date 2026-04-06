@@ -19,7 +19,7 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 | Module              | Statut | Détails                                                                           |
 | :------------------ | :----- | :-------------------------------------------------------------------------------- |
 | **Landing Page**    | ✅ OK  | Rebranding VTC -> VTC/Taxi terminé.                                               |
-| **Booking Flow**    | ✅ OK  | Intégration API Adresses (BAN + Genève) & Validation Dpt 05 OK.                   |
+| **Booking Flow**    | ✅ OK  | Intégration API Adresses (BAN + Genève) & Validation Dpt 05 + ARA OK.          |
 | **Auth Admin**      | ✅ OK  | Connexion sécurisée.                                                              |
 | **Dashboard Stats** | ✅ OK  | Messages (Recherche/Tri/Suppr), Nettoyage UI Paiement OK.                         |
 | **Gestion Résas**   | ✅ OK  | Refactorisation modulaire (Filtres, API séparés).                                 |
@@ -32,13 +32,10 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 - **SOLID / DRY** : Refactoring `Booking.jsx` via `useBookingForm` et validation externalisée. Données statiques isolées dans `bookingConstants.js`.
 - **Data Layer** : Supabase RPC `get_dashboard_stats` implantée.
 - **Sécurité** : Ajout fonction d'assainissement anti-XSS dans `bookingValidation.js`.
-- **Test Suite** : Vitest configuré avec `afterEach(cleanup)` pour éviter les fuites de mémoire.
+- **Test Suite** : Vitest configuré pour valider les départements 05 et Auvergne-Rhône-Alpes (ARA).
 
 ## 🚀 ROADMAP (EN COURS)
 
-1. **[DEV]** Rebranding Global : Remplacement de "VTC" par "VTC/Taxi".
-2. **[DEV]** API Adresses (BAN) & Logique Métier : Saisie assistée et contrôle strict du département "05" (Hautes-Alpes) à l'aller ou au retour.
-3. **[DEV]** Dashboard Nettoyage UI : Masquer les encarts "CB/Espèces" des derniers paiements.
 4. **[DEV]** Dashboard Messages : Implémenter la recherche par nom, le tri, et la suppression.
 
 ## 📜 CONVENTIONS DE CODE

@@ -22,20 +22,28 @@ export const validateStep1 = (form) => {
     if (!form.returnTime) errors.returnTime = 'Heure de retour requise';
   }
 
-  // Business Rule: Departure or Arrival MUST be in Hautes-Alpes (05)
+  // Business Rule: Departure or Arrival MUST be in Hautes-Alpes (05) OR Auvergne-Rhône-Alpes (ARA)
   if (form.departure?.label && form.arrival?.label) {
-    const isDept05 = (addr) => {
+    const isDeptAllowed = (addr) => {
       if (!addr) return false;
-      // BAN API context often has "05, Hautes-Alpes, Provence-Alpes-Côte d'Azur"
-      // Postcode is also reliable for 05.
+      
       const postcode = String(addr.postcode || '');
       const context = String(addr.context || '');
-      return postcode.startsWith('05') || context.includes('05');
+      
+      // Allowed departments: 
+      // 05 (Hautes-Alpes)
+      // 01, 03, 07, 15, 26, 38, 42, 43, 63, 69, 73, 74 (Auvergne-Rhône-Alpes)
+      const allowedDepts = [
+        '01', '03', '05', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'
+      ];
+      
+      return allowedDepts.some(dept => postcode.startsWith(dept) || context.includes(`${dept},`));
     };
 
-    if (!isDept05(form.departure) && !isDept05(form.arrival)) {
-      errors.departure = 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05)';
-      errors.arrival = 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05)';
+    if (!isDeptAllowed(form.departure) && !isDeptAllowed(form.arrival)) {
+      const errorMsg = 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05) ou en Auvergne-Rhône-Alpes';
+      errors.departure = errorMsg;
+      errors.arrival = errorMsg;
     }
   }
   
