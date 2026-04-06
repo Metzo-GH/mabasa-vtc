@@ -16,7 +16,7 @@ export default function BookingSuccess({ form, onReset }) {
           <div className="booking__success-summary">
             <div className="booking__summary-row">
               <span>Trajet</span>
-              <strong>{form.departure} → {form.arrival}</strong>
+              <strong>{form.departure?.label} → {form.arrival?.label}</strong>
             </div>
             <div className="booking__summary-row">
               <span>Date</span>

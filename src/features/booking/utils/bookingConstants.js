@@ -1,7 +1,7 @@
 export const INITIAL_FORM = {
   tripType: 'oneway',
-  departure: '',
-  arrival: '',
+  departure: { label: '', city: '', postcode: '', context: '' },
+  arrival: { label: '', city: '', postcode: '', context: '' },
   date: '',
   time: '',
   returnDate: '',

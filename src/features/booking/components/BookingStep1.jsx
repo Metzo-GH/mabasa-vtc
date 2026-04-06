@@ -1,5 +1,6 @@
 import { MapPin, Calendar, Clock, Users, Luggage, ArrowRight, ArrowLeftRight, AlertCircle } from 'lucide-react';
 import { ZONES } from '../../../config/brand';
+import AddressAutocomplete from './AddressAutocomplete';
 
 const TRIP_TYPES = [
   { value: 'oneway', label: 'Aller simple' },
@@ -11,6 +12,16 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
 
   return (
     <div className="booking__panel">
+      {/* Informational Banner */}
+      <div className="booking__notice animate-fade-in-up">
+        <AlertCircle size={16} />
+        <p>
+          <strong>Note professionnelle :</strong> Pour garantir la qualité de notre service, 
+          chaque trajet doit impérativement avoir ses <strong>Hautes-Alpes (05)</strong> 
+          comme point de <strong>départ</strong> ou de <strong>destination</strong>.
+        </p>
+      </div>
+
       {/* Trip type */}
       <div className="booking__trip-type">
         {TRIP_TYPES.map(type => (
@@ -28,42 +39,22 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
 
       {/* Departure & Arrival */}
       <div className="booking__row">
-        <div className="form-group">
-          <label className="form-label" htmlFor="departure">
-            <MapPin size={14} /> Lieu de départ
-          </label>
-          <select
-            id="departure"
-            className={`form-select ${errors.departure ? 'form-input--error' : ''}`}
-            value={form.departure}
-            onChange={(e) => updateField('departure', e.target.value)}
-          >
-            <option value="">Sélectionnez un lieu</option>
-            {ZONES.destinations.map(dest => (
-              <option key={dest} value={dest}>{dest}</option>
-            ))}
-            <option value="__other">Autre (préciser dans les notes)</option>
-          </select>
-          {errors.departure && <span className="form-error"><AlertCircle size={12} /> {errors.departure}</span>}
-        </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="arrival">
-            <MapPin size={14} /> Lieu d'arrivée
-          </label>
-          <select
-            id="arrival"
-            className={`form-select ${errors.arrival ? 'form-input--error' : ''}`}
-            value={form.arrival}
-            onChange={(e) => updateField('arrival', e.target.value)}
-          >
-            <option value="">Sélectionnez un lieu</option>
-            {ZONES.destinations.map(dest => (
-              <option key={dest} value={dest}>{dest}</option>
-            ))}
-            <option value="__other">Autre (préciser dans les notes)</option>
-          </select>
-          {errors.arrival && <span className="form-error"><AlertCircle size={12} /> {errors.arrival}</span>}
-        </div>
+        <AddressAutocomplete
+          id="departure"
+          label="Lieu de départ"
+          value={form.departure?.label}
+          onChange={(val) => updateField('departure', val)}
+          error={errors.departure}
+          placeholder="Ex: Gap, Briançon, Embrun..."
+        />
+        <AddressAutocomplete
+          id="arrival"
+          label="Lieu d'arrivée"
+          value={form.arrival?.label}
+          onChange={(val) => updateField('arrival', val)}
+          error={errors.arrival}
+          placeholder="Ex: Gare de Gap, Aéroport..."
+        />
       </div>
 
       {/* Date & Time */}

@@ -69,7 +69,7 @@ export default function Home() {
         <div className="hero__bg" />
         <div className="hero__overlay" />
         <div className="container hero__content">
-          <span className="section-label animate-fade-in-up">VTC Premium • Hautes-Alpes</span>
+          <span className="section-label animate-fade-in-up">VTC/Taxi Premium • Hautes-Alpes</span>
           <h1 className="hero__title animate-fade-in-up animate-delay-1">
             Votre chauffeur privé<br />
             <span className="text-gradient">dans les Alpes</span>

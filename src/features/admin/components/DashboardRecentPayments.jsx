@@ -64,9 +64,6 @@ export default function DashboardRecentPayments({ bookings }) {
         )}
       </div>
 
-      <div className="panel-footer-stats text-muted">
-        CB: 58% · Espèces: 29% · App: 13%
-      </div>
     </div>
   );
 }

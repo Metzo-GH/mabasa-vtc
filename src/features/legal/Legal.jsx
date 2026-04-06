@@ -9,7 +9,7 @@ const LEGAL_CONTENT = {
 ## Éditeur du site
 
 **${BRAND.name}**
-Chauffeur VTC — Hautes-Alpes, France
+Chauffeur VTC/Taxi — Hautes-Alpes, France
 
 - **Email** : ${BRAND.email}
 - **Téléphone** : ${BRAND.phone}
@@ -37,7 +37,7 @@ Ce site peut utiliser des cookies à des fins de statistiques et d'amélioration
     content: `
 ## 1. Objet
 
-Les présentes Conditions Générales de Vente (CGV) régissent les relations entre ${BRAND.name}, chauffeur VTC, et ses clients pour toute réservation de transport effectuée via ce site internet.
+Les présentes Conditions Générales de Vente (CGV) régissent les relations entre ${BRAND.name}, chauffeur VTC/Taxi, et ses clients pour toute réservation de transport effectuée via ce site internet.
 
 ## 2. Réservation
 

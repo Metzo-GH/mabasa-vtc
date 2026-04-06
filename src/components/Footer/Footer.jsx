@@ -15,7 +15,7 @@ export default function Footer() {
           <div className="footer__brand">
             <div className="footer__logo">
               <span className="footer__logo-text">{BRAND.name}</span>
-              <span className="footer__logo-sub">VTC Premium</span>
+              <span className="footer__logo-sub">VTC/Taxi Premium</span>
             </div>
             <p className="footer__desc">{BRAND.description}</p>
           </div>

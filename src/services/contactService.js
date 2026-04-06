@@ -50,3 +50,15 @@ export async function markContactAsRead(id) {
   if (error) throw error;
   return data;
 }
+/**
+ * Delete a contact message (admin only).
+ */
+export async function deleteContact(id) {
+  const { error } = await supabase
+    .from('contacts')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+  return true;
+}

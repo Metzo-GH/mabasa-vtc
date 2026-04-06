@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  Mail, Phone, Clock, CheckCircle,
-  Loader2, AlertCircle, RefreshCw, Eye
+  Mail, Phone, Clock, Loader2, AlertCircle, RefreshCw, Eye, 
+  Search, Trash2, SortAsc, SortDesc, Filter, CheckCircle, 
+  ChevronRight, User
 } from 'lucide-react';
-import { getContacts, markContactAsRead } from '../../services/contactService';
+import { getContacts, markContactAsRead, deleteContact } from '../../services/contactService';
 import './Admin.css';
 
 export default function ContactList() {
@@ -11,6 +12,11 @@ export default function ContactList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  
+  // States for search and sort
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc'); // 'desc' = newer first
+  const [filterUnread, setFilterUnread] = useState(false);
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -44,6 +50,49 @@ export default function ContactList() {
     }
   };
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) return;
+
+    try {
+      await deleteContact(id);
+      setContacts(prev => prev.filter(c => c.id !== id));
+      if (selectedId === id) setSelectedId(null);
+    } catch (err) {
+      console.error('Delete contact error:', err);
+      alert('Erreur lors de la suppression.');
+    }
+  };
+
+  // Logic for filtering and sorting
+  const filteredContacts = useMemo(() => {
+    let result = [...contacts];
+
+    // Search
+    if (searchTerm) {
+      const lowSearch = searchTerm.toLowerCase();
+      result = result.filter(c => 
+        c.name.toLowerCase().includes(lowSearch) || 
+        c.email.toLowerCase().includes(lowSearch) ||
+        c.message.toLowerCase().includes(lowSearch)
+      );
+    }
+
+    // Filter Unread
+    if (filterUnread) {
+      result = result.filter(c => !c.is_read);
+    }
+
+    // Sort by Date
+    result.sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
+    return result;
+  }, [contacts, searchTerm, filterUnread, sortOrder]);
+
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric',
@@ -58,97 +107,147 @@ export default function ContactList() {
   const selected = contacts.find(c => c.id === selectedId);
 
   return (
-    <div className="admin-page">
-      <div className="admin-page__header">
+    <div className="admin-page admin-dark-theme">
+      {/* Premium Header */}
+      <div className="admin-page__header premium-header">
         <div>
-          <h1>Messages</h1>
-          {unreadCount > 0 && (
-            <span className="admin-page__badge">{unreadCount} non lu{unreadCount > 1 ? 's' : ''}</span>
-          )}
+          <h1 className="flex-center gap-2"><Mail size={28} /> Messagerie</h1>
+          <span className="dash-subtitle">
+            {unreadCount > 0 
+              ? `${unreadCount} message${unreadCount > 1 ? 's' : ''} non lu${unreadCount > 1 ? 's' : ''}` 
+              : 'Tous les messages sont traités'}
+          </span>
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={fetchContacts} disabled={loading}>
-          <RefreshCw size={16} className={loading ? 'spin' : ''} />
-          Actualiser
-        </button>
+        
+        <div className="dash-filters glass-panel">
+          <div className="search-box">
+            <Search size={16} />
+            <input 
+              type="text" 
+              placeholder="Rechercher par nom, email..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
+          <button 
+            className={`btn btn-icon ${filterUnread ? 'btn-active' : ''}`}
+            onClick={() => setFilterUnread(!filterUnread)}
+            title="Messages non lus uniquement"
+          >
+            <Filter size={16} />
+          </button>
+
+          <button 
+            className="btn btn-icon"
+            onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+            title={sortOrder === 'desc' ? 'Plus récents en premier' : 'Plus anciens en premier'}
+          >
+            {sortOrder === 'desc' ? <SortDesc size={16} /> : <SortAsc size={16} />}
+          </button>
+
+          <button className="btn btn-icon btn-refresh" onClick={fetchContacts} title="Actualiser">
+            <RefreshCw size={16} className={loading ? 'spin' : ''} />
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="admin-error">
-          <AlertCircle size={16} /> {error}
-        </div>
+        <div className="admin-error glass-panel"><AlertCircle size={16} /> {error}</div>
       )}
 
-      {loading && (
-        <div className="admin-loading">
-          <Loader2 size={32} className="spin" />
-        </div>
+      {loading && !contacts.length && (
+        <div className="admin-loading"><Loader2 size={32} className="spin" /></div>
       )}
 
-      {!loading && !error && contacts.length === 0 && (
-        <div className="admin-empty">
+      {!loading && filteredContacts.length === 0 && (
+        <div className="admin-empty glass-panel animate-fade-in">
           <Mail size={48} strokeWidth={1} />
-          <p>Aucun message pour le moment</p>
+          <p>{searchTerm ? 'Aucun résultat pour votre recherche' : 'Aucun message pour le moment'}</p>
         </div>
       )}
 
       {!loading && contacts.length > 0 && (
         <div className="contacts-layout">
-          {/* Contact list */}
-          <div className="contacts-list">
-            {contacts.map(contact => (
+          {/* Main List */}
+          <div className="contacts-list glass-panel scroll-custom">
+            {filteredContacts.map(contact => (
               <div
                 key={contact.id}
-                className={`contact-item ${!contact.is_read ? 'contact-item--unread' : ''} ${selectedId === contact.id ? 'contact-item--selected' : ''}`}
+                className={`contact-item premium-item ${!contact.is_read ? 'contact-item--unread' : ''} ${selectedId === contact.id ? 'contact-item--selected' : ''}`}
                 onClick={() => handleSelect(contact)}
               >
                 <div className="contact-item__header">
-                  <strong>{contact.name}</strong>
+                  <div className="contact-item__user">
+                    <div className="avatar micro-avatar">{contact.name.charAt(0).toUpperCase()}</div>
+                    <strong>{contact.name}</strong>
+                  </div>
                   <span className="contact-item__date">{formatDate(contact.created_at)}</span>
                 </div>
                 <p className="contact-item__preview">
-                  {contact.message.length > 80
-                    ? `${contact.message.slice(0, 80)}...`
+                  {contact.message.length > 60
+                    ? `${contact.message.slice(0, 60)}...`
                     : contact.message}
                 </p>
-                {!contact.is_read && <div className="contact-item__dot" />}
+                <div className="contact-item__footer">
+                   {!contact.is_read && <span className="badge-new">Nouveau</span>}
+                   <button className="btn-delete-mini" onClick={(e) => handleDelete(e, contact.id)}>
+                     <Trash2 size={14} />
+                   </button>
+                </div>
+                {selectedId === contact.id && <ChevronRight size={18} className="selected-indicator" />}
               </div>
             ))}
           </div>
 
-          {/* Message detail */}
-          <div className="contact-detail">
+          {/* Detailed View */}
+          <div className="contact-detail glass-panel animate-fade-in">
             {selected ? (
-              <>
-                <div className="contact-detail__header">
-                  <h2>{selected.name}</h2>
-                  <span className="contact-detail__date">
-                    <Clock size={14} />
-                    {formatDate(selected.created_at)}
-                  </span>
+              <div className="detail-content">
+                <div className="contact-detail__header-main">
+                  <div className="detail-avatar">
+                   <User size={32} />
+                  </div>
+                  <div className="detail-title">
+                    <h2>{selected.name}</h2>
+                    <span className="detail-date"><Clock size={12} /> {formatDate(selected.created_at)}</span>
+                  </div>
                 </div>
-                <div className="contact-detail__info">
-                  <a href={`mailto:${selected.email}`}>
-                    <Mail size={14} /> {selected.email}
-                  </a>
+
+                <div className="contact-detail__meta">
+                  <div className="meta-row">
+                    <Mail size={16} /> 
+                    <a href={`mailto:${selected.email}`} className="text-link">{selected.email}</a>
+                  </div>
                   {selected.phone && (
-                    <a href={`tel:${selected.phone}`}>
-                      <Phone size={14} /> {selected.phone}
-                    </a>
+                    <div className="meta-row">
+                      <Phone size={16} /> 
+                      <a href={`tel:${selected.phone}`} className="text-link">{selected.phone}</a>
+                    </div>
                   )}
                 </div>
-                <div className="contact-detail__message">
-                  {selected.message}
-                </div>
-                {selected.is_read && (
-                  <div className="contact-detail__read">
-                    <Eye size={14} /> Lu
+
+                <div className="contact-detail__message-box">
+                  <div className="message-label">Message</div>
+                  <div className="message-text">
+                    {selected.message}
                   </div>
-                )}
-              </>
+                </div>
+
+                <div className="detail-actions">
+                  {selected.is_read && (
+                    <span className="read-status"><CheckCircle size={14} /> Message consulté</span>
+                  )}
+                  <button className="btn btn-danger btn-sm flex-center gap-2" onClick={(e) => handleDelete(e, selected.id)}>
+                    <Trash2 size={16} /> Supprimer le message
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="contact-detail__empty">
-                <Mail size={40} strokeWidth={1} />
-                <p>Sélectionnez un message pour le lire</p>
+                <Mail size={48} strokeWidth={1} className="floating-anim" />
+                <p>Sélectionnez un message pour<br />afficher les détails</p>
               </div>
             )}
           </div>
