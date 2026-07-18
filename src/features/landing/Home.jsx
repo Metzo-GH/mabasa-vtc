@@ -4,9 +4,10 @@ import {
   CheckCircle, Shield, Clock, Star, ChevronRight,
   MapPin, Users, Calendar, Stethoscope
 } from 'lucide-react';
-import { BRAND, SERVICES } from '../../config/brand';
+import { SERVICES } from '../../config/brand';
 import { ROUTES } from '../../config/routes';
 import { useTheme } from '../../context/ThemeContext';
+import { useSiteSettings } from '../../context/SiteContext';
 import './Home.css';
 
 const ICON_MAP = {
@@ -142,6 +143,7 @@ const MEDICAL_TESTIMONIALS = [
 
 export default function Home() {
   const { mode } = useTheme();
+  const { siteSettings } = useSiteSettings();
   const isMedical = mode === 'medical';
 
   const steps = isMedical ? MEDICAL_STEPS : STEPS;
@@ -199,7 +201,7 @@ export default function Home() {
             ) : (
               <>
                 Transferts aéroport, gare et stations de ski. Courchevel, Val Thorens, Méribel,
-                Genève — voyagez confortablement avec {BRAND.name}.
+                Genève — voyagez confortablement avec {siteSettings.name}.
               </>
             )}
           </p>
@@ -245,12 +247,12 @@ export default function Home() {
             <p className="subtitle">
               {isMedical ? (
                 <>
-                  Pour toutes vos démarches de santé, {BRAND.name} assure un transport assis professionnel 
+                  Pour toutes vos démarches de santé, {siteSettings.name} assure un transport assis professionnel 
                   et discret dans tout le secteur d'Arles et de la région PACA.
                 </>
               ) : (
                 <>
-                  Des transferts aéroport aux déplacements professionnels, {BRAND.name} vous accompagne
+                  Des transferts aéroport aux déplacements professionnels, {siteSettings.name} vous accompagne
                   dans tous vos trajets alpins.
                 </>
               )}

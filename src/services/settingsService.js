@@ -77,3 +77,58 @@ export async function updateActiveMode(mode) {
     return { fallback: true, mode };
   }
 }
+
+/**
+ * Fetch a generic setting by key
+ */
+export async function getSetting(key, defaultValue = null) {
+  try {
+    const localFallback = localStorage.getItem(`setting_${key}`);
+    
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', key)
+      .maybeSingle();
+
+    if (error) {
+      if (localFallback) return JSON.parse(localFallback);
+      return defaultValue;
+    }
+
+    return data?.value || (localFallback ? JSON.parse(localFallback) : defaultValue);
+  } catch (err) {
+    console.error(`Error fetching setting ${key}, using fallback:`, err);
+    const localFallback = localStorage.getItem(`setting_${key}`);
+    return localFallback ? JSON.parse(localFallback) : defaultValue;
+  }
+}
+
+/**
+ * Update a generic setting by key
+ */
+export async function updateSetting(key, value) {
+  // Update localStorage first for immediate local reactivity
+  localStorage.setItem(`setting_${key}`, JSON.stringify(value));
+
+  try {
+    const { data, error } = await supabase
+      .from('settings')
+      .upsert({
+        key,
+        value,
+        updated_at: new Date().toISOString()
+      })
+      .select();
+
+    if (error) {
+      console.warn(`Failed to update setting ${key} in Supabase table:`, error.message);
+      return { fallback: true, value };
+    }
+
+    return data;
+  } catch (err) {
+    console.error(`Exception updating setting ${key} in Supabase:`, err);
+    return { fallback: true, value };
+  }
+}

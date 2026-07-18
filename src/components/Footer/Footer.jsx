@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
-import { BRAND } from '../../config/brand';
 import { ROUTES } from '../../config/routes';
 import { useTheme } from '../../context/ThemeContext';
+import { useSiteSettings } from '../../context/SiteContext';
 import './Footer.css';
 
 export default function Footer() {
   const { mode } = useTheme();
+  const { siteSettings } = useSiteSettings();
   const currentYear = new Date().getFullYear();
 
   const isMedical = mode === 'medical';
   const description = isMedical
     ? 'Taxi conventionné agréé CPAM à Arles et ses environs. Transport assis personnalisé vers hôpitaux, cliniques et consultations médicales.'
-    : BRAND.description;
+    : siteSettings.description;
 
   const destinations = isMedical
     ? ['Arles', 'Nîmes', 'Avignon', 'Marseille', 'Montpellier']
@@ -25,7 +26,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="footer__brand">
             <div className="footer__logo">
-              <span className="footer__logo-text">{BRAND.name}</span>
+              <span className="footer__logo-text">{siteSettings.name}</span>
               <span className="footer__logo-sub">
                 {isMedical ? 'Taxi Conventionné' : 'VTC/Taxi Premium'}
               </span>
@@ -54,11 +55,11 @@ export default function Footer() {
             <h4 className="footer__title">Contact</h4>
             <div className="footer__contact-item">
               <Phone size={16} />
-              <span>{BRAND.phone}</span>
+              <span>{siteSettings.phone}</span>
             </div>
             <div className="footer__contact-item">
               <Mail size={16} />
-              <span>{BRAND.email}</span>
+              <span>{siteSettings.email}</span>
             </div>
             <div className="footer__contact-item">
               <MapPin size={16} />
@@ -72,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="footer__bottom">
-          <p>&copy; {currentYear} {BRAND.name}. Tous droits réservés.</p>
+          <p>&copy; {currentYear} {siteSettings.name}. Tous droits réservés.</p>
           <div className="footer__legal">
             <Link to={ROUTES.LEGAL}>Mentions légales</Link>
             <Link to={ROUTES.CGV}>CGV</Link>

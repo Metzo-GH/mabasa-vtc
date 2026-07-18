@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, MessageCircle, Send, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
-import { BRAND } from '../../config/brand';
+import { useSiteSettings } from '../../context/SiteContext';
 import { createContact } from '../../services/contactService';
 import './Contact.css';
 
 export default function Contact() {
+  const { siteSettings } = useSiteSettings();
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +51,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4>Téléphone</h4>
-                  <p>{BRAND.phone}</p>
+                  <p>{siteSettings.phone}</p>
                 </div>
               </div>
 
@@ -60,7 +61,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4>Email</h4>
-                  <p>{BRAND.email}</p>
+                  <p>{siteSettings.email}</p>
                 </div>
               </div>
 
@@ -70,7 +71,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h4>WhatsApp</h4>
-                  <p>{BRAND.whatsapp}</p>
+                  <p>{siteSettings.whatsapp}</p>
                 </div>
               </div>
 

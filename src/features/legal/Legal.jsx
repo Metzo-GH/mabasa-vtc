@@ -1,18 +1,18 @@
 import { useLocation } from 'react-router-dom';
-import { BRAND } from '../../config/brand';
+import { useSiteSettings } from '../../context/SiteContext';
 import './Legal.css';
 
-const LEGAL_CONTENT = {
+const getLegalContent = (siteSettings) => ({
   '/mentions-legales': {
     title: 'Mentions Légales',
     content: `
 ## Éditeur du site
 
-**${BRAND.name}**
+**${siteSettings.name}**
 Chauffeur VTC/Taxi — Hautes-Alpes, France
 
-- **Email** : ${BRAND.email}
-- **Téléphone** : ${BRAND.phone}
+- **Email** : ${siteSettings.email}
+- **Téléphone** : ${siteSettings.phone}
 
 ## Hébergeur
 
@@ -25,7 +25,7 @@ L'ensemble du contenu de ce site (textes, images, graphismes, logo, icônes, etc
 
 ## Données personnelles
 
-Les informations recueillies via les formulaires de ce site font l'objet d'un traitement informatique destiné à la gestion des réservations et des demandes de contact. Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, veuillez nous contacter à l'adresse : ${BRAND.email}.
+Les informations recueillies via les formulaires de ce site font l'objet d'un traitement informatique destiné à la gestion des réservations et des demandes de contact. Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Pour exercer ce droit, veuillez nous contacter à l'adresse : ${siteSettings.email}.
 
 ## Cookies
 
@@ -37,11 +37,11 @@ Ce site peut utiliser des cookies à des fins de statistiques et d'amélioration
     content: `
 ## 1. Objet
 
-Les présentes Conditions Générales de Vente (CGV) régissent les relations entre ${BRAND.name}, chauffeur VTC/Taxi, et ses clients pour toute réservation de transport effectuée via ce site internet.
+Les présentes Conditions Générales de Vente (CGV) régissent les relations entre ${siteSettings.name}, chauffeur VTC/Taxi, et ses clients pour toute réservation de transport effectuée via ce site internet.
 
 ## 2. Réservation
 
-La réservation est effectuée via le formulaire en ligne ou par téléphone. Toute réservation est considérée comme ferme après confirmation par ${BRAND.name} par email ou téléphone.
+La réservation est effectuée via le formulaire en ligne ou par téléphone. Toute réservation est considérée comme ferme après confirmation par ${siteSettings.name} par email ou téléphone.
 
 ## 3. Tarifs
 
@@ -70,22 +70,24 @@ Les modifications d'horaire ou de lieu sont possibles sous réserve de disponibi
 
 ## 7. Responsabilité
 
-${BRAND.name} s'engage à assurer le transport de ses passagers dans les meilleures conditions de sécurité et de confort. Le chauffeur est couvert par une assurance professionnelle RC Pro.
+${siteSettings.name} s'engage à assurer le transport de ses passagers dans les meilleures conditions de sécurité et de confort. Le chauffeur est couvert par une assurance professionnelle RC Pro.
 
 ## 8. Réclamations
 
-Toute réclamation doit être adressée à ${BRAND.email} dans un délai de 7 jours suivant la prestation.
+Toute réclamation doit être adressée à ${siteSettings.email} dans un délai de 7 jours suivant la prestation.
 
 ## 9. Droit applicable
 
 Les présentes CGV sont soumises au droit français. En cas de litige, les tribunaux compétents seront ceux du ressort du siège de l'entreprise.
     `,
   },
-};
+});
 
 export default function Legal() {
   const { pathname } = useLocation();
-  const page = LEGAL_CONTENT[pathname] || LEGAL_CONTENT['/mentions-legales'];
+  const { siteSettings } = useSiteSettings();
+  const contentMap = getLegalContent(siteSettings);
+  const page = contentMap[pathname] || contentMap['/mentions-legales'];
 
   // Simple markdown-to-HTML (handles ## headings, **, -, and paragraphs)
   const renderContent = (markdown) => {

@@ -1,13 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '../../context/ThemeContext';
-import { AlertCircle, CheckCircle2, ShieldAlert, Sparkles, Database } from 'lucide-react';
+import { useSiteSettings } from '../../context/SiteContext';
+import { AlertCircle, CheckCircle2, ShieldAlert, Sparkles, Database, Save, Phone, Mail, MessageCircle } from 'lucide-react';
 import './Admin.css';
 
 export default function SettingsPanel() {
   const { mode, setMode } = useTheme();
+  const { siteSettings, saveSettings } = useSiteSettings();
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  
+  const [isUpdatingContact, setIsUpdatingContact] = useState(false);
+  const [successContactMsg, setSuccessContactMsg] = useState('');
+  
   const [showSql, setShowSql] = useState(false);
+
+  const [contactForm, setContactForm] = useState({
+    phone: '',
+    email: '',
+    whatsapp: ''
+  });
+
+  useEffect(() => {
+    if (siteSettings) {
+      setContactForm({
+        phone: siteSettings.phone || '',
+        email: siteSettings.email || '',
+        whatsapp: siteSettings.whatsapp || ''
+      });
+    }
+  }, [siteSettings]);
 
   const handleModeChange = async (targetMode) => {
     if (mode === targetMode) return;
@@ -21,6 +44,21 @@ export default function SettingsPanel() {
       console.error('Error updating site mode:', err);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setIsUpdatingContact(true);
+    setSuccessContactMsg('');
+    try {
+      await saveSettings(contactForm);
+      setSuccessContactMsg('Les informations de contact ont été mises à jour avec succès !');
+      setTimeout(() => setSuccessContactMsg(''), 4000);
+    } catch (err) {
+      console.error('Error updating contact settings:', err);
+    } finally {
+      setIsUpdatingContact(false);
     }
   };
 
@@ -47,12 +85,15 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS medical_motif TEXT;`;
       {/* Header */}
       <div className="admin-page__header premium-header">
         <div>
-          <h1>Configuration de la Saison</h1>
-          <span className="dash-subtitle">Gérez le thème et les services du site en un clic</span>
+          <h1>Configuration du Site</h1>
+          <span className="dash-subtitle">Gérez la saisonnalité et les informations publiques du site</span>
         </div>
       </div>
 
-      {/* Success Alert */}
+      {/* SECTION 1: THEME & MODE */}
+      <h2 style={{ fontSize: '1.2rem', marginBottom: 'var(--space-4)', color: 'var(--color-text)' }}>Saison et Mode (Thème visuel)</h2>
+
+      {/* Success Alert Mode */}
       {successMsg && (
         <div className="glass-panel alert-success animate-fade-in-up" style={{ margin: '0 0 var(--space-6) 0', padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)', borderColor: 'var(--color-success)', color: 'var(--color-success)' }}>
           <CheckCircle2 size={20} />
@@ -133,6 +174,67 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS medical_motif TEXT;`;
         </div>
 
       </div>
+
+      {/* SECTION 2: CONTACT SETTINGS */}
+      <h2 style={{ fontSize: '1.2rem', marginBottom: 'var(--space-4)', color: 'var(--color-text)' }}>Informations de Contact</h2>
+      
+      {/* Success Alert Contact */}
+      {successContactMsg && (
+        <div className="glass-panel alert-success animate-fade-in-up" style={{ margin: '0 0 var(--space-6) 0', padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-3)', borderColor: 'var(--color-success)', color: 'var(--color-success)' }}>
+          <CheckCircle2 size={20} />
+          <span>{successContactMsg}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleContactSubmit} className="glass-panel" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+          <div className="form-group">
+            <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Phone size={16} /> Numéro de téléphone
+            </label>
+            <input 
+              type="text" 
+              className="form-input" 
+              value={contactForm.phone}
+              onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+              placeholder="+33 6 12 34 56 78"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Mail size={16} /> Adresse Email
+            </label>
+            <input 
+              type="email" 
+              className="form-input" 
+              value={contactForm.email}
+              onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+              placeholder="contact@example.com"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <MessageCircle size={16} /> Numéro WhatsApp (sans espace)
+            </label>
+            <input 
+              type="text" 
+              className="form-input" 
+              value={contactForm.whatsapp}
+              onChange={(e) => setContactForm({ ...contactForm, whatsapp: e.target.value })}
+              placeholder="+33612345678"
+            />
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button type="submit" className="btn btn-primary" disabled={isUpdatingContact} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <Save size={18} />
+            {isUpdatingContact ? 'Enregistrement...' : 'Enregistrer les modifications'}
+          </button>
+        </div>
+      </form>
+
 
       {/* SQL Migration Assistant */}
       <div className="glass-panel" style={{ padding: 'var(--space-6)', borderColor: 'var(--color-border)' }}>
