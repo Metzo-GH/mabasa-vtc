@@ -28,7 +28,7 @@ export async function createContact(formData) {
 export async function getContacts() {
   const { data, error } = await supabase
     .from('contacts')
-    .select('*')
+    .select('id, name, email, phone, message, is_read, created_at')
     .order('is_read', { ascending: true })
     .order('created_at', { ascending: false });
 

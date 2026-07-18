@@ -8,17 +8,31 @@ import CalendarView from './CalendarView';
 import BookingCard from './components/BookingCard';
 import BookingFilters, { STATUS_FILTERS } from './components/BookingFilters';
 import { useBookings } from './hooks/useBookings';
+import { STATUS_CONFIG as BASE_STATUS_CONFIG } from '../booking/utils/bookingConstants';
+import ConfirmModal from '../../components/ConfirmModal';
 import './Admin.css';
 
 const STATUS_CONFIG = {
-  pending: { label: 'En attente', color: '#f59e0b', icon: Clock },
-  quoted: { label: 'Devis envoyé', color: '#3b82f6', icon: CheckCircle },
-  confirmed: { label: 'Confirmé', color: '#10b981', icon: CheckCircle },
-  completed: { label: 'Terminé', color: '#6366f1', icon: CheckCircle },
-  cancelled: { label: 'Annulé', color: '#ef4444', icon: XCircle },
+  pending:   { ...BASE_STATUS_CONFIG.pending,   icon: Clock },
+  quoted:    { ...BASE_STATUS_CONFIG.quoted,    icon: CheckCircle },
+  confirmed: { ...BASE_STATUS_CONFIG.confirmed, icon: CheckCircle },
+  completed: { ...BASE_STATUS_CONFIG.completed, icon: CheckCircle },
+  cancelled: { ...BASE_STATUS_CONFIG.cancelled, icon: XCircle },
 };
 
+
 export default function BookingList() {
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirmer',
+    cancelText: 'Annuler',
+    onConfirm: null,
+    onCancel: null,
+    isDanger: true
+  });
+
   const {
     bookings,
     filteredBookings,
@@ -44,7 +58,25 @@ export default function BookingList() {
     updatingId,
     deletingId,
     fetchBookings
-  } = useBookings();
+  } = useBookings({
+    onRequestConfirmation: (config) => {
+      setConfirmConfig({
+        isOpen: true,
+        title: config.title,
+        message: config.message,
+        confirmText: config.confirmText || 'Confirmer',
+        cancelText: config.cancelText || 'Annuler',
+        isDanger: config.isDanger !== false,
+        onConfirm: () => {
+          config.onConfirm();
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        },
+        onCancel: () => {
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      });
+    }
+  });
 
   const [viewMode, setViewMode] = useState('list');
   const [expandedId, setExpandedId] = useState(null);
@@ -235,6 +267,7 @@ export default function BookingList() {
           </div>
         )}
       </div>
+      <ConfirmModal {...confirmConfig} />
     </div>
   );
 }

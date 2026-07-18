@@ -5,6 +5,8 @@ import {
   ChevronRight, User
 } from 'lucide-react';
 import { getContacts, markContactAsRead, deleteContact } from '../../services/contactService';
+import { formatDateTime as formatDate } from '../../utils/dateFormatters';
+import ConfirmModal from '../../components/ConfirmModal';
 import './Admin.css';
 
 export default function ContactList() {
@@ -13,6 +15,17 @@ export default function ContactList() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Supprimer',
+    cancelText: 'Annuler',
+    onConfirm: null,
+    onCancel: null,
+    isDanger: true
+  });
+
   // States for search and sort
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' = newer first
@@ -50,18 +63,31 @@ export default function ContactList() {
     }
   };
 
-  const handleDelete = async (e, id) => {
+  const handleDelete = (e, id) => {
     e.stopPropagation();
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce message ?')) return;
-
-    try {
-      await deleteContact(id);
-      setContacts(prev => prev.filter(c => c.id !== id));
-      if (selectedId === id) setSelectedId(null);
-    } catch (err) {
-      console.error('Delete contact error:', err);
-      alert('Erreur lors de la suppression.');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Supprimer le message',
+      message: 'Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      isDanger: true,
+      onConfirm: async () => {
+        try {
+          await deleteContact(id);
+          setContacts(prev => prev.filter(c => c.id !== id));
+          if (selectedId === id) setSelectedId(null);
+        } catch (err) {
+          console.error('Delete contact error:', err);
+          alert('Erreur lors de la suppression.');
+        } finally {
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      },
+      onCancel: () => {
+        setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   // Logic for filtering and sorting
@@ -93,15 +119,7 @@ export default function ContactList() {
     return result;
   }, [contacts, searchTerm, filterUnread, sortOrder]);
 
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+
 
   const unreadCount = contacts.filter(c => !c.is_read).length;
   const selected = contacts.find(c => c.id === selectedId);
@@ -171,7 +189,7 @@ export default function ContactList() {
       {!loading && contacts.length > 0 && (
         <div className="contacts-layout">
           {/* Main List */}
-          <div className="contacts-list glass-panel scroll-custom">
+          <div className="contacts-list scroll-custom">
             {filteredContacts.map(contact => (
               <div
                 key={contact.id}
@@ -202,7 +220,7 @@ export default function ContactList() {
           </div>
 
           {/* Detailed View */}
-          <div className="contact-detail glass-panel animate-fade-in">
+          <div className="contact-detail animate-fade-in">
             {selected ? (
               <div className="detail-content">
                 <div className="contact-detail__header-main">
@@ -253,6 +271,7 @@ export default function ContactList() {
           </div>
         </div>
       )}
+      <ConfirmModal {...confirmConfig} />
     </div>
   );
 }

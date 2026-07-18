@@ -10,57 +10,67 @@ import { supabase } from '../lib/supabase';
  * Maps the frontend form fields to the database column names.
  */
 export async function createBooking(formData) {
-  const { data, error } = await supabase
-    .from('bookings')
-    .insert({
-      trip_type: formData.tripType,
-      departure: formData.departure,
-      arrival: formData.arrival,
-      pickup_date: formData.date,
-      pickup_time: formData.time,
-      return_date: formData.tripType === 'roundtrip' ? formData.returnDate : null,
-      return_time: formData.tripType === 'roundtrip' ? formData.returnTime : null,
-      passengers: parseInt(formData.passengers, 10),
-      luggage: parseInt(formData.luggage, 10),
-      flight_number: formData.flightNumber || null,
-      notes: formData.notes || null,
-      first_name: formData.firstName,
-      last_name: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      // Medical additions
-      service_type: formData.serviceType || 'vtc',
-      secu_number: formData.secuNumber || null,
-      caisse_affiliation: formData.caisseAffiliation || null,
-      prescription_medicale: !!formData.prescriptionMedicale,
-      medical_motif: formData.medicalMotif || null,
-    })
+  const bookingPayload = {
+    trip_type: formData.tripType,
+    departure: formData.departure,
+    arrival: formData.arrival,
+    pickup_date: formData.date,
+    pickup_time: formData.time,
+    passengers: parseInt(formData.passengers, 10),
+    luggage: parseInt(formData.luggage, 10) || 0,
+    first_name: formData.firstName,
+    last_name: formData.lastName,
+    email: formData.email,
+    phone: formData.phone,
+  };
 
-  if (error) throw error;
+  const insertData = {
+    ...bookingPayload,
+    return_date: formData.tripType === 'roundtrip' ? formData.returnDate : null,
+    return_time: formData.tripType === 'roundtrip' ? formData.returnTime : null,
+    flight_number: formData.flightNumber || null,
+    notes: formData.notes || null,
+  };
+
+  // Conditionally include medical columns to prevent crashing if database is not migrated
+  if (formData.serviceType === 'medical') {
+    insertData.service_type = 'medical';
+    insertData.secu_number = formData.secuNumber || null;
+    insertData.caisse_affiliation = formData.caisseAffiliation || null;
+    insertData.prescription_medicale = !!formData.prescriptionMedicale;
+    insertData.medical_motif = formData.medicalMotif || null;
+  }
+
+  let { data, error } = await supabase
+    .from('bookings')
+    .insert(insertData);
+
+  if (error) {
+    // If column not found (database not migrated), retry with base schema fields only
+    if (error.code === '42703') {
+      console.warn('Medical columns do not exist in bookings table. Retrying insert with base VTC columns.');
+      const { data: retryData, error: retryError } = await supabase
+        .from('bookings')
+        .insert({
+          ...bookingPayload,
+          return_date: formData.tripType === 'roundtrip' ? formData.returnDate : null,
+          return_time: formData.tripType === 'roundtrip' ? formData.returnTime : null,
+          flight_number: formData.flightNumber || null,
+          notes: formData.notes || null,
+        });
+      
+      if (retryError) throw retryError;
+      data = retryData;
+    } else {
+      throw error;
+    }
+  }
 
   // Trigger the email notification (fire-and-forget, wrapped in try/catch to not block the UI)
   try {
-    const { data: emailData, error: emailError } = await supabase.functions.invoke('smart-endpoint', {
-      body: { 
-        bookingData: {
-          trip_type: formData.tripType,
-          departure: formData.departure,
-          arrival: formData.arrival,
-          pickup_date: formData.date,
-          pickup_time: formData.time,
-          passengers: formData.passengers,
-          luggage: formData.luggage,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
-          email: formData.email,
-          phone: formData.phone
-        } 
-      }
+    await supabase.functions.invoke('smart-endpoint', {
+      body: { bookingData: bookingPayload }
     });
-
-    if (emailError) {
-      console.error('Failed to send email:', emailError);
-    }
   } catch (err) {
     console.error('Error invoking send-email function:', err);
   }
@@ -88,7 +98,27 @@ export async function getBookings(statusFilter = null, serviceTypeFilter = null)
   }
 
   const { data, error } = await query;
-  if (error) throw error;
+  
+  if (error) {
+    // If PostgreSQL error 42703 (column does not exist) occurs, retry query without serviceType filter or other missing fields
+    if (error.code === '42703') {
+      console.warn('service_type column does not exist in bookings table. Retrying query without serviceTypeFilter.');
+      let retryQuery = supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (statusFilter && statusFilter !== 'all') {
+        retryQuery = retryQuery.eq('status', statusFilter);
+      }
+      
+      const { data: retryData, error: retryError } = await retryQuery;
+      if (retryError) throw retryError;
+      return retryData;
+    }
+    throw error;
+  }
+  
   return data;
 }
 

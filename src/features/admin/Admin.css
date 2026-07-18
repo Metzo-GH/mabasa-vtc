@@ -3,6 +3,15 @@
    Same design system (black/gold) for consistency
    ============================================= */
 
+:root {
+  --bg-primary: #0A0A0F;
+  --bg-secondary: #12121A;
+  --border-color: #2A2A35;
+  --accent: #C9A84C;
+  --bg-tertiary: #1A1A25;
+}
+
+
 /* ---- Login Page ---- */
 .admin-login {
   min-height: 100vh;
@@ -1126,7 +1135,7 @@
    NEW DARK MODE PREMIUM COMPLEMENTS
    ======================================== */
 .admin-dark-theme {
-  background: #111111;
+  background: var(--bg-primary);
   color: #F5F5F5;
   min-height: 100vh;
 }

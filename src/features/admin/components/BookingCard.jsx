@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Loader2, CheckCircle, XCircle, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { formatDate, formatTime } from '../../../utils/dateFormatters';
+import { MEDICAL_MOTIF_LABELS } from '../../booking/utils/bookingConstants';
 
 export default function BookingCard({
   booking,
@@ -15,18 +17,6 @@ export default function BookingCard({
 }) {
   const [quotePrice, setQuotePrice] = useState('');
   const StatusIcon = status.icon;
-
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const formatTime = (timeStr) => {
-    return timeStr ? timeStr.slice(0, 5) : '';
-  };
 
   return (
     <div className={`booking-card ${isDeleting ? 'booking-card--deleting' : ''}`}>
@@ -109,12 +99,7 @@ export default function BookingCard({
                 <div>
                   <label>Motif Médical</label>
                   <p style={{ textTransform: 'capitalize' }}>
-                    {booking.medical_motif === 'hospitalisation' && 'Hospitalisation'}
-                    {booking.medical_motif === 'consultation' && 'Consultation'}
-                    {booking.medical_motif === 'dialyse' && 'Dialyse / Chimio / Radio'}
-                    {booking.medical_motif === 'reeducation' && 'Rééducation'}
-                    {booking.medical_motif === 'autre' && 'Autre motif'}
-                    {!booking.medical_motif && 'Non renseigné'}
+                    {MEDICAL_MOTIF_LABELS[booking.medical_motif] || 'Non renseigné'}
                   </p>
                 </div>
                 <div>

@@ -29,14 +29,14 @@ Offrir une expérience utilisateur fluide, un calcul de devis intelligent et un 
 
 ## 🏗️ ARCHITECTURE (RECENT)
 
-- **SOLID / DRY** : Refactoring `Booking.jsx` via `useBookingForm` et validation externalisée. Données statiques isolées dans `bookingConstants.js`.
-- **Data Layer** : Supabase RPC `get_dashboard_stats` implantée.
-- **Sécurité** : Ajout fonction d'assainissement anti-XSS dans `bookingValidation.js`.
-- **Test Suite** : Vitest configuré pour valider les départements 05 et Auvergne-Rhône-Alpes (ARA).
+- **SOLID / DRY** : Refactoring `Booking.jsx` via `useBookingForm`. Scission de `useBookings` en `useBookingFilters` et `useBookingMutations`. Centralisation des constantes et dateFormatters.
+- **Data Layer** : Supabase RPC `get_dashboard_stats` implantée. select('*') migrés vers des sélections de colonnes explicites (sécurité OWASP).
+- **Sécurité & UX** : Ajout fonction d'assainissement anti-XSS. Intégration de `<ConfirmModal>` pour remplacer les dialogues natifs.
+- **Test Suite** : Vitest configuré pour valider les départements 05 et ARA. Tous les tests sont au vert (9/9 success).
 
 ## 🚀 ROADMAP (EN COURS)
 
-4. **[DEV]** Dashboard Messages : Implémenter la recherche par nom, le tri, et la suppression.
+4. **[DEV]** Dashboard Messages : Recherche, tri, suppression (Confirmations intégrées avec `<ConfirmModal>`). Completed.
 
 ## 📜 CONVENTIONS DE CODE
 
