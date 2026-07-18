@@ -28,6 +28,12 @@ export async function createBooking(formData) {
       last_name: formData.lastName,
       email: formData.email,
       phone: formData.phone,
+      // Medical additions
+      service_type: formData.serviceType || 'vtc',
+      secu_number: formData.secuNumber || null,
+      caisse_affiliation: formData.caisseAffiliation || null,
+      prescription_medicale: !!formData.prescriptionMedicale,
+      medical_motif: formData.medicalMotif || null,
     })
 
   if (error) throw error;
@@ -67,7 +73,7 @@ export async function createBooking(formData) {
  * Sorted by creation date, most recent first.
  * Optional status filter.
  */
-export async function getBookings(statusFilter = null) {
+export async function getBookings(statusFilter = null, serviceTypeFilter = null) {
   let query = supabase
     .from('bookings')
     .select('*')
@@ -75,6 +81,10 @@ export async function getBookings(statusFilter = null) {
 
   if (statusFilter && statusFilter !== 'all') {
     query = query.eq('status', statusFilter);
+  }
+
+  if (serviceTypeFilter && serviceTypeFilter !== 'all') {
+    query = query.eq('service_type', serviceTypeFilter);
   }
 
   const { data, error } = await query;

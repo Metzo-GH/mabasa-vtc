@@ -3,7 +3,7 @@
  * Ensures the logic is testable without React dependency.
  */
 
-export const validateStep1 = (form) => {
+export const validateStep1 = (form, mode = 'vtc') => {
   const errors = {};
   
   if (!form.departure?.label) {
@@ -22,7 +22,7 @@ export const validateStep1 = (form) => {
     if (!form.returnTime) errors.returnTime = 'Heure de retour requise';
   }
 
-  // Business Rule: Departure or Arrival MUST be in Hautes-Alpes (05) OR Auvergne-Rhône-Alpes (ARA)
+  // Business Rule: Geographic validation based on selected mode
   if (form.departure?.label && form.arrival?.label) {
     const isDeptAllowed = (addr) => {
       if (!addr) return false;
@@ -30,18 +30,19 @@ export const validateStep1 = (form) => {
       const postcode = String(addr.postcode || '');
       const context = String(addr.context || '');
       
-      // Allowed departments: 
-      // 05 (Hautes-Alpes)
-      // 01, 03, 07, 15, 26, 38, 42, 43, 63, 69, 73, 74 (Auvergne-Rhône-Alpes)
-      const allowedDepts = [
-        '01', '03', '05', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'
-      ];
+      // VTC Mode: 05 (Hautes-Alpes) and Auvergne-Rhône-Alpes (01, 03, 07, 15, 26, 38, 42, 43, 63, 69, 73, 74)
+      // Medical Mode: Arles region (13 - Bouches-du-Rhône, 30 - Gard, 84 - Vaucluse)
+      const allowedDepts = mode === 'medical'
+        ? ['13', '30', '84']
+        : ['01', '03', '05', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'];
       
       return allowedDepts.some(dept => postcode.startsWith(dept) || context.includes(`${dept},`));
     };
 
     if (!isDeptAllowed(form.departure) && !isDeptAllowed(form.arrival)) {
-      const errorMsg = 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05) ou en Auvergne-Rhône-Alpes';
+      const errorMsg = mode === 'medical'
+        ? 'Pour le taxi conventionné, le départ ou l\'arrivée doit s\'effectuer dans la région d\'Arles (13, 30, 84).'
+        : 'Le départ ou l\'arrivée doit être dans les Hautes-Alpes (05) ou en Auvergne-Rhône-Alpes';
       errors.departure = errorMsg;
       errors.arrival = errorMsg;
     }

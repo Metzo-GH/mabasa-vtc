@@ -1,6 +1,7 @@
-import { MapPin, Calendar, Clock, Users, Luggage, ArrowRight, ArrowLeftRight, AlertCircle } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Luggage, ArrowRight, ArrowLeftRight, AlertCircle, Stethoscope } from 'lucide-react';
 import { ZONES } from '../../../config/brand';
 import AddressAutocomplete from './AddressAutocomplete';
+import { useTheme } from '../../../context/ThemeContext';
 
 const TRIP_TYPES = [
   { value: 'oneway', label: 'Aller simple' },
@@ -8,6 +9,8 @@ const TRIP_TYPES = [
 ];
 
 export default function BookingStep1({ form, updateField, errors, onNext }) {
+  const { mode } = useTheme();
+  const isMedical = mode === 'medical';
   const today = new Date().toISOString().split('T')[0];
 
   return (
@@ -16,10 +19,20 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
       <div className="booking__notice animate-fade-in-up">
         <AlertCircle size={16} />
         <p>
-          <strong>Note professionnelle :</strong> Pour garantir la qualité de notre service, 
-          chaque trajet doit impérativement avoir les <strong>Hautes-Alpes (05)</strong> 
-          ou la région <strong>Auvergne-Rhône-Alpes</strong> comme point de 
-          <strong>départ</strong> ou de <strong>destination</strong>.
+          {isMedical ? (
+            <>
+              <strong>Taxi Conventionné CPAM :</strong> Le trajet doit s'effectuer depuis ou vers 
+              la région d'<strong>Arles et ses environs</strong> (13, 30, 84). 
+              Une <strong>Prescription Médicale de Transport</strong> (bon de transport) est requise pour bénéficier du tiers-payant.
+            </>
+          ) : (
+            <>
+              <strong>Note professionnelle :</strong> Pour garantir la qualité de notre service, 
+              chaque trajet doit impérativement avoir les <strong>Hautes-Alpes (05)</strong> 
+              ou la région <strong>Auvergne-Rhône-Alpes</strong> comme point de 
+              <strong>départ</strong> ou de <strong>destination</strong>.
+            </>
+          )}
         </p>
       </div>
 
@@ -42,19 +55,19 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
       <div className="booking__row">
         <AddressAutocomplete
           id="departure"
-          label="Lieu de départ"
+          label={isMedical ? "Lieu de départ (Domicile, Hôpital...)" : "Lieu de départ"}
           value={form.departure?.label}
           onChange={(val) => updateField('departure', val)}
           error={errors.departure}
-          placeholder="Ex: Gap, Briançon, Embrun..."
+          placeholder={isMedical ? "Ex: Arles, Tarascon, Fourques..." : "Ex: Gap, Briançon, Embrun..."}
         />
         <AddressAutocomplete
           id="arrival"
-          label="Lieu d'arrivée"
+          label={isMedical ? "Lieu d'arrivée (Hôpital, Clinique...)" : "Lieu d'arrivée"}
           value={form.arrival?.label}
           onChange={(val) => updateField('arrival', val)}
           error={errors.arrival}
-          placeholder="Ex: Gare de Gap, Aéroport..."
+          placeholder={isMedical ? "Ex: CHU Nîmes Carémeau, Hôpital d'Arles..." : "Ex: Gare de Gap, Aéroport..."}
         />
       </div>
 
@@ -62,7 +75,7 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
       <div className="booking__row">
         <div className="form-group">
           <label className="form-label" htmlFor="date">
-            <Calendar size={14} /> Date de prise en charge
+            <Calendar size={14} /> Date du trajet
           </label>
           <input
             type="date"
@@ -76,7 +89,7 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
         </div>
         <div className="form-group">
           <label className="form-label" htmlFor="time">
-            <Clock size={14} /> Heure de prise en charge
+            <Clock size={14} /> Heure du trajet
           </label>
           <input
             type="time"
@@ -122,11 +135,11 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
         </div>
       )}
 
-      {/* Passengers & Luggage */}
+      {/* Passengers & Luggage (conditionally render based on mode) */}
       <div className="booking__row">
         <div className="form-group">
           <label className="form-label" htmlFor="passengers">
-            <Users size={14} /> Nombre de passagers
+            <Users size={14} /> {isMedical ? 'Nombre de personnes' : 'Nombre de passagers'}
           </label>
           <select
             id="passengers"
@@ -134,42 +147,73 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
             value={form.passengers}
             onChange={(e) => updateField('passengers', e.target.value)}
           >
-            {[1, 2, 3, 4, 5, 6, 7].map(n => (
-              <option key={n} value={n}>{n} passager{n > 1 ? 's' : ''}</option>
-            ))}
+            {isMedical ? (
+              <>
+                <option value="1">1 Patient seul</option>
+                <option value="2">1 Patient + 1 Accompagnateur</option>
+              </>
+            ) : (
+              [1, 2, 3, 4, 5, 6, 7].map(n => (
+                <option key={n} value={n}>{n} passager{n > 1 ? 's' : ''}</option>
+              ))
+            )}
           </select>
         </div>
-        <div className="form-group">
-          <label className="form-label" htmlFor="luggage">
-            <Luggage size={14} /> Nombre de bagages
-          </label>
-          <select
-            id="luggage"
-            className="form-select"
-            value={form.luggage}
-            onChange={(e) => updateField('luggage', e.target.value)}
-          >
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-              <option key={n} value={n}>{n} bagage{n > 1 ? 's' : ''}</option>
-            ))}
-          </select>
-        </div>
+        
+        {!isMedical && (
+          <div className="form-group">
+            <label className="form-label" htmlFor="luggage">
+              <Luggage size={14} /> Nombre de bagages
+            </label>
+            <select
+              id="luggage"
+              className="form-select"
+              value={form.luggage}
+              onChange={(e) => updateField('luggage', e.target.value)}
+            >
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                <option key={n} value={n}>{n} bagage{n > 1 ? 's' : ''}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
-      {/* Flight number & Notes */}
-      <div className="form-group">
-        <label className="form-label" htmlFor="flightNumber">
-          N° de vol (optionnel)
-        </label>
-        <input
-          type="text"
-          id="flightNumber"
-          className="form-input"
-          placeholder="Ex: AF1234"
-          value={form.flightNumber}
-          onChange={(e) => updateField('flightNumber', e.target.value)}
-        />
-      </div>
+      {/* Flight number (VTC) or Medical Motif (Medical) */}
+      {isMedical ? (
+        <div className="form-group">
+          <label className="form-label" htmlFor="medicalMotif">
+            Motif du déplacement médical
+          </label>
+          <select
+            id="medicalMotif"
+            className="form-select"
+            value={form.medicalMotif || ''}
+            onChange={(e) => updateField('medicalMotif', e.target.value)}
+          >
+            <option value="">Sélectionnez un motif...</option>
+            <option value="hospitalisation">Hospitalisation (Entrée/Sortie)</option>
+            <option value="consultation">Consultation médecin ou spécialiste</option>
+            <option value="dialyse">Dialyse / Chimiothérapie / Radiothérapie</option>
+            <option value="reeducation">Rééducation / Kinésithérapie</option>
+            <option value="autre">Autre motif médical assis</option>
+          </select>
+        </div>
+      ) : (
+        <div className="form-group">
+          <label className="form-label" htmlFor="flightNumber">
+            N° de vol (optionnel)
+          </label>
+          <input
+            type="text"
+            id="flightNumber"
+            className="form-input"
+            placeholder="Ex: AF1234"
+            value={form.flightNumber}
+            onChange={(e) => updateField('flightNumber', e.target.value)}
+          />
+        </div>
+      )}
 
       <div className="form-group">
         <label className="form-label" htmlFor="notes">
@@ -178,11 +222,27 @@ export default function BookingStep1({ form, updateField, errors, onNext }) {
         <textarea
           id="notes"
           className="form-textarea"
-          placeholder="Siège enfant, équipement de ski, adresse précise..."
+          placeholder={isMedical ? "Précisez si besoin d'un fauteuil roulant pliant, de l'adresse du service hospitalier précis..." : "Siège enfant, équipement de ski, adresse précise..."}
           value={form.notes}
           onChange={(e) => updateField('notes', e.target.value)}
         />
       </div>
+
+      {isMedical && (
+        <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: 'var(--space-3)', margin: 'var(--space-4) 0' }}>
+          <input
+            type="checkbox"
+            id="prescriptionMedicale"
+            style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+            checked={!!form.prescriptionMedicale}
+            required
+            onChange={(e) => updateField('prescriptionMedicale', e.target.checked)}
+          />
+          <label htmlFor="prescriptionMedicale" style={{ cursor: 'pointer', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
+            Je certifie disposer d'une <strong>prescription médicale de transport</strong> (bon de transport) délivrée par mon médecin. *
+          </label>
+        </div>
+      )}
 
       <button type="button" className="btn btn-primary btn-lg booking__next" onClick={onNext}>
         Continuer

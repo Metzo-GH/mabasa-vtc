@@ -1,15 +1,19 @@
 import { ArrowRight, AlertCircle, Loader2, Send } from 'lucide-react';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function BookingStep2({ form, updateField, errors, onPrev, isLoading, submitError }) {
+  const { mode } = useTheme();
+  const isMedical = mode === 'medical';
+
   return (
     <div className="booking__panel">
       {/* Summary */}
       <div className="booking__recap">
         <h3>Récapitulatif du trajet</h3>
         <div className="booking__recap-grid">
-          <span>{form.departure}</span>
+          <span>{form.departure?.label || form.departure}</span>
           <ArrowRight size={16} />
-          <span>{form.arrival}</span>
+          <span>{form.arrival?.label || form.arrival}</span>
           <span className="booking__recap-date">
             {new Date(form.date || new Date()).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {form.time}
           </span>
@@ -73,6 +77,34 @@ export default function BookingStep2({ form, updateField, errors, onPrev, isLoad
           {errors.phone && <span className="form-error"><AlertCircle size={12} /> {errors.phone}</span>}
         </div>
       </div>
+
+      {/* Optional Medical Fields */}
+      {isMedical && (
+        <div className="booking__row animate-fade-in-up">
+          <div className="form-group">
+            <label className="form-label" htmlFor="secuNumber">Numéro de Sécurité Sociale (optionnel)</label>
+            <input
+              type="text"
+              id="secuNumber"
+              className="form-input"
+              placeholder="Ex: 1 85 12 75 123 456 89"
+              value={form.secuNumber || ''}
+              onChange={(e) => updateField('secuNumber', e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label" htmlFor="caisseAffiliation">Organisme / Caisse d'Assurance (optionnel)</label>
+            <input
+              type="text"
+              id="caisseAffiliation"
+              className="form-input"
+              placeholder="Ex: CPAM 13, CPAM 30, MSA..."
+              value={form.caisseAffiliation || ''}
+              onChange={(e) => updateField('caisseAffiliation', e.target.value)}
+            />
+          </div>
+        </div>
+      )}
 
       {submitError && (
         <div className="booking__error">

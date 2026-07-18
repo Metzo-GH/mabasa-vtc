@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  CalendarCheck, MessageSquare, LogOut, Menu, X, ChevronLeft, LayoutDashboard
+  CalendarCheck, MessageSquare, LogOut, Menu, X, ChevronLeft, LayoutDashboard, Settings
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -11,6 +11,7 @@ const ADMIN_NAV = [
   { label: 'Tableau de bord', path: ROUTES.ADMIN_DASHBOARD, icon: LayoutDashboard },
   { label: 'Réservations', path: ROUTES.ADMIN_BOOKINGS, icon: CalendarCheck },
   { label: 'Messages', path: ROUTES.ADMIN_CONTACTS, icon: MessageSquare },
+  { label: 'Configuration', path: ROUTES.ADMIN_SETTINGS, icon: Settings },
 ];
 
 export default function AdminLayout() {

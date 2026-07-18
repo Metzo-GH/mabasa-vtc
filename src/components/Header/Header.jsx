@@ -3,9 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone } from 'lucide-react';
 import { BRAND } from '../../config/brand';
 import { NAV_LINKS, ROUTES } from '../../config/routes';
+import { useTheme } from '../../context/ThemeContext';
 import './Header.css';
 
 export default function Header() {
+  const { mode } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
@@ -26,9 +28,11 @@ export default function Header() {
   return (
     <header className={`header ${isScrolled ? 'header--scrolled' : ''}`}>
       <div className="container header__inner">
-        <Link to={ROUTES.HOME} className="header__logo" aria-label="Accueil MABASA VTC/Taxi">
+        <Link to={ROUTES.HOME} className="header__logo" aria-label="Accueil MABASA">
           <span className="header__logo-text">{BRAND.name}</span>
-          <span className="header__logo-sub">VTC/Taxi</span>
+          <span className="header__logo-sub">
+            {mode === 'medical' ? 'Taxi Conventionné' : 'VTC/Taxi'}
+          </span>
         </Link>
 
         <nav className={`header__nav ${isMenuOpen ? 'header__nav--open' : ''}`}>

@@ -2,12 +2,14 @@ import BookingStep1 from './components/BookingStep1';
 import BookingStep2 from './components/BookingStep2';
 import BookingSuccess from './components/BookingSuccess';
 import { useBookingForm } from '../../hooks/useBookingForm';
+import { useTheme } from '../../context/ThemeContext';
 import './Booking.css';
 import { INITIAL_FORM } from './utils/bookingConstants';
 
-
-
 export default function Booking() {
+  const { mode } = useTheme();
+  const isMedical = mode === 'medical';
+
   const {
     form,
     step,
@@ -31,10 +33,22 @@ export default function Booking() {
       <div className="container">
         {/* Header */}
         <div className="booking__header animate-fade-in-up">
-          <span className="section-label">Réservation</span>
-          <h1>Réservez votre <span className="text-accent">trajet</span></h1>
+          <span className="section-label">
+            {isMedical ? 'Taxi Conventionné CPAM' : 'Réservation VTC'}
+          </span>
+          <h1>
+            {isMedical ? (
+              <>Réservez votre <span className="text-accent">Taxi Conventionné</span></>
+            ) : (
+              <>Réservez votre <span className="text-accent">trajet</span></>
+            )}
+          </h1>
           <p className="subtitle">
-            Remplissez le formulaire ci-dessous et nous vous contacterons pour confirmer votre réservation.
+            {isMedical ? (
+              'Remplissez les détails médicaux ci-dessous pour planifier votre transport de santé conventionné.'
+            ) : (
+              'Remplissez le formulaire ci-dessous et nous vous contacterons pour confirmer votre réservation.'
+            )}
           </p>
         </div>
 

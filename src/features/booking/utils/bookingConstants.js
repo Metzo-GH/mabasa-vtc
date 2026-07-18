@@ -14,4 +14,10 @@ export const INITIAL_FORM = {
   phone: '',
   flightNumber: '',
   notes: '',
+  // Medical specific fields
+  serviceType: 'vtc',
+  secuNumber: '',
+  caisseAffiliation: '',
+  prescriptionMedicale: false,
+  medicalMotif: '',
 };

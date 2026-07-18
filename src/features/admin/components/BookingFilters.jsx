@@ -21,6 +21,8 @@ export default function BookingFilters({
   setSearchQuery,
   filter,
   setFilter,
+  serviceFilter = 'all',
+  setServiceFilter,
   dateFilter,
   setDateFilter
 }) {
@@ -69,6 +71,28 @@ export default function BookingFilters({
           ))}
         </div>
       </div>
+
+      {/* Service Type Filter Row */}
+      {setServiceFilter && (
+        <div className="admin-filters-row" style={{ marginTop: '0.75rem' }}>
+          <div className="admin-filters">
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', marginRight: 'var(--space-2)' }}>Activité :</span>
+            {[
+              { value: 'all', label: 'Tous' },
+              { value: 'vtc', label: 'VTC' },
+              { value: 'medical', label: 'Taxi Conventionné' },
+            ].map(f => (
+              <button
+                key={f.value}
+                className={`admin-filter-btn ${serviceFilter === f.value ? 'admin-filter-btn--active' : ''}`}
+                onClick={() => setServiceFilter(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 }

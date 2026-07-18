@@ -15,6 +15,7 @@ export const ROUTES = {
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_BOOKINGS: '/admin/reservations',
   ADMIN_CONTACTS: '/admin/messages',
+  ADMIN_SETTINGS: '/admin/config',
 };
 
 export const NAV_LINKS = [

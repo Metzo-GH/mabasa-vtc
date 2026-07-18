@@ -2,10 +2,21 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { BRAND } from '../../config/brand';
 import { ROUTES } from '../../config/routes';
+import { useTheme } from '../../context/ThemeContext';
 import './Footer.css';
 
 export default function Footer() {
+  const { mode } = useTheme();
   const currentYear = new Date().getFullYear();
+
+  const isMedical = mode === 'medical';
+  const description = isMedical
+    ? 'Taxi conventionné agréé CPAM à Arles et ses environs. Transport assis personnalisé vers hôpitaux, cliniques et consultations médicales.'
+    : BRAND.description;
+
+  const destinations = isMedical
+    ? ['Arles', 'Nîmes', 'Avignon', 'Marseille', 'Montpellier']
+    : ['Courchevel', 'Val Thorens', 'Méribel', 'Genève', 'Lyon'];
 
   return (
     <footer className="footer">
@@ -15,9 +26,11 @@ export default function Footer() {
           <div className="footer__brand">
             <div className="footer__logo">
               <span className="footer__logo-text">{BRAND.name}</span>
-              <span className="footer__logo-sub">VTC/Taxi Premium</span>
+              <span className="footer__logo-sub">
+                {isMedical ? 'Taxi Conventionné' : 'VTC/Taxi Premium'}
+              </span>
             </div>
-            <p className="footer__desc">{BRAND.description}</p>
+            <p className="footer__desc">{description}</p>
           </div>
 
           {/* Navigation */}
@@ -31,11 +44,9 @@ export default function Footer() {
           {/* Destinations */}
           <div className="footer__col">
             <h4 className="footer__title">Destinations</h4>
-            <span className="footer__link">Courchevel</span>
-            <span className="footer__link">Val Thorens</span>
-            <span className="footer__link">Méribel</span>
-            <span className="footer__link">Genève</span>
-            <span className="footer__link">Lyon</span>
+            {destinations.map((dest) => (
+              <span key={dest} className="footer__link">{dest}</span>
+            ))}
           </div>
 
           {/* Contact */}
@@ -51,7 +62,7 @@ export default function Footer() {
             </div>
             <div className="footer__contact-item">
               <MapPin size={16} />
-              <span>Hautes-Alpes, France</span>
+              <span>{isMedical ? 'Arles, France' : 'Hautes-Alpes, France'}</span>
             </div>
             <div className="footer__contact-item">
               <Clock size={16} />

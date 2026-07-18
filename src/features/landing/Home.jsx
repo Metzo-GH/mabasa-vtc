@@ -2,16 +2,18 @@ import { Link } from 'react-router-dom';
 import {
   Plane, Mountain, Briefcase, Route, ArrowRight,
   CheckCircle, Shield, Clock, Star, ChevronRight,
-  MapPin, Users, Calendar
+  MapPin, Users, Calendar, Stethoscope
 } from 'lucide-react';
 import { BRAND, SERVICES } from '../../config/brand';
 import { ROUTES } from '../../config/routes';
+import { useTheme } from '../../context/ThemeContext';
 import './Home.css';
 
 const ICON_MAP = {
-  Plane, Mountain, Briefcase, Route,
+  Plane, Mountain, Briefcase, Route, Shield, Clock, Stethoscope
 };
 
+// === VTC PREMIUM CONSTANTS ===
 const STEPS = [
   {
     number: '01',
@@ -61,7 +63,110 @@ const TESTIMONIALS = [
   },
 ];
 
+// === MEDICAL TAXI CONVENTIONNE CONSTANTS ===
+const MEDICAL_SERVICES = [
+  {
+    id: 'hospital',
+    title: 'Entrée & Sortie d\'Hospitalisation',
+    description: 'Prise en charge personnalisée pour vos transferts vers ou depuis les hôpitaux en toute sécurité.',
+    icon: 'Shield',
+  },
+  {
+    id: 'consultation',
+    title: 'Consultations Médicales',
+    description: 'Transport ponctuel pour vos rendez-vous chez les médecins généralistes, spécialistes ou examens.',
+    icon: 'Stethoscope',
+  },
+  {
+    id: 'regular',
+    title: 'Traitements Réguliers',
+    description: 'Trajets récurrents pour vos dialyses, chimiothérapies, radiothérapies et séances de rééducation.',
+    icon: 'Clock',
+  },
+  {
+    id: 'exams',
+    title: 'Examens & Radiographie',
+    description: 'Navettes vers les laboratoires, radiologies, IRM et scanners dans toute la région d\'Arles.',
+    icon: 'Route',
+  },
+];
+
+const MEDICAL_STEPS = [
+  {
+    number: '01',
+    title: 'Prescription Médicale',
+    description: 'Demandez à votre médecin prescripteur votre bon de transport obligatoire.',
+    icon: Calendar,
+  },
+  {
+    number: '02',
+    title: 'Réservez votre taxi',
+    description: 'Réservez en ligne en indiquant l\'heure et le lieu de votre rendez-vous de soin.',
+    icon: CheckCircle,
+  },
+  {
+    number: '03',
+    title: 'Tiers-Payant Direct',
+    description: 'Présentez votre carte vitale et bon de transport pour une prise en charge à 100% sans avance de frais.',
+    icon: Shield,
+  },
+];
+
+const MEDICAL_FEATURES = [
+  { icon: Shield, title: 'Agréé CPAM (Tiers-Payant)', desc: 'Transports conventionnés remboursés intégralement, facturation directe aux caisses.' },
+  { icon: Clock, title: 'Ponctualité & Discrétion', desc: 'Respect strict du secret médical et accompagnement personnalisé jusqu\'à votre service.' },
+  { icon: Star, title: 'Véhicules Grand Confort', desc: 'Véhicules récents, désinfectés et spacieux pour garantir un trajet serein.' },
+  { icon: Users, title: 'Zones Arles & Région PACA', desc: 'Prise en charge à Arles et transfert vers les cliniques de Nîmes, Marseille, Avignon.' },
+];
+
+const MEDICAL_TESTIMONIALS = [
+  {
+    name: 'Jean-Pierre M.',
+    location: 'Arles → Nîmes (CHU Carémeau)',
+    text: 'Trajet très confortable pour mes séances de rééducation régulières. Le chauffeur est ponctuel, poli et m\'aide à m\'installer. Prise en charge à 100% avec le bon de transport.',
+    rating: 5,
+  },
+  {
+    name: 'Marie D.',
+    location: 'Arles → Marseille (Hôpital La Timone)',
+    text: 'Chauffeurs discrets et très professionnels pour mes examens réguliers à Marseille. Tiers-payant appliqué directement sans avance de frais. Très appréciable.',
+    rating: 5,
+  },
+  {
+    name: 'Robert G.',
+    location: 'Fourques → Clinique Jeanne d\'Arc (Arles)',
+    text: 'Je recommande vivement MABASA pour les transports de santé. Service de grande qualité sur Arles, véhicule toujours impeccable.',
+    rating: 5,
+  },
+];
+
 export default function Home() {
+  const { mode } = useTheme();
+  const isMedical = mode === 'medical';
+
+  const steps = isMedical ? MEDICAL_STEPS : STEPS;
+  const features = isMedical ? MEDICAL_FEATURES : FEATURES;
+  const testimonials = isMedical ? MEDICAL_TESTIMONIALS : TESTIMONIALS;
+  const services = isMedical ? MEDICAL_SERVICES : SERVICES;
+
+  const destinations = isMedical
+    ? [
+        { from: 'Arles Centre', to: 'CHU de Nîmes (Carémeau)', duration: '~35 min' },
+        { from: 'Arles Centre', to: 'Hôpital de la Timone (Marseille)', duration: '~1h05' },
+        { from: 'Arles Centre', to: 'Hôpital Joseph Imbert (Arles)', duration: '~10 min' },
+        { from: 'Fourques', to: 'Clinique de Provence (Arles)', duration: '~12 min' },
+        { from: 'Tarascon', to: 'Hôpital Henri Duffaut (Avignon)', duration: '~30 min' },
+        { from: 'Saint-Rémy', to: 'CHU de Nîmes', duration: '~45 min' },
+      ]
+    : [
+        { from: 'Aéroport de Genève', to: 'Courchevel', duration: '~2h30' },
+        { from: 'Aéroport de Genève', to: 'Val Thorens', duration: '~2h45' },
+        { from: 'Aéroport de Lyon', to: 'Courchevel', duration: '~3h' },
+        { from: 'Gare de Moutiers', to: 'Courchevel', duration: '~30 min' },
+        { from: 'Chambéry', to: 'Val Thorens', duration: '~1h45' },
+        { from: 'Genève Centre', to: 'Méribel', duration: '~2h30' },
+      ];
+
   return (
     <main>
       {/* === HERO === */}
@@ -69,18 +174,38 @@ export default function Home() {
         <div className="hero__bg" />
         <div className="hero__overlay" />
         <div className="container hero__content">
-          <span className="section-label animate-fade-in-up">VTC/Taxi Premium • Hautes-Alpes</span>
+          <span className="section-label animate-fade-in-up">
+            {isMedical ? 'Taxi Conventionné CPAM • Région Arles' : 'VTC/Taxi Premium • Hautes-Alpes'}
+          </span>
           <h1 className="hero__title animate-fade-in-up animate-delay-1">
-            Votre chauffeur privé<br />
-            <span className="text-gradient">dans les Alpes</span>
+            {isMedical ? (
+              <>
+                Votre taxi conventionné<br />
+                <span className="text-gradient">à Arles & Région</span>
+              </>
+            ) : (
+              <>
+                Votre chauffeur privé<br />
+                <span className="text-gradient">dans les Alpes</span>
+              </>
+            )}
           </h1>
           <p className="subtitle hero__subtitle animate-fade-in-up animate-delay-2">
-            Transferts aéroport, gare et stations de ski. Courchevel, Val Thorens, Méribel,
-            Genève — voyagez confortablement avec {BRAND.name}.
+            {isMedical ? (
+              <>
+                Transports sanitaires assis et accompagnement personnalisé vers vos rendez-vous de soin. 
+                Hôpitaux, cliniques, dialyses. Prise en charge à 100% avec bon de transport.
+              </>
+            ) : (
+              <>
+                Transferts aéroport, gare et stations de ski. Courchevel, Val Thorens, Méribel,
+                Genève — voyagez confortablement avec {BRAND.name}.
+              </>
+            )}
           </p>
           <div className="hero__actions animate-fade-in-up animate-delay-3">
             <Link to={ROUTES.BOOKING} className="btn btn-primary btn-lg">
-              Réserver un trajet
+              Réservez votre taxi
               <ArrowRight size={20} />
             </Link>
             <Link to={ROUTES.CONTACT} className="btn btn-secondary btn-lg">
@@ -90,7 +215,7 @@ export default function Home() {
           <div className="hero__badges animate-fade-in-up animate-delay-4">
             <div className="hero__badge">
               <CheckCircle size={16} />
-              <span>Prix fixe, sans surprise</span>
+              <span>{isMedical ? 'Agrée CPAM (100% Remboursé)' : 'Prix fixe, sans surprise'}</span>
             </div>
             <div className="hero__badge">
               <CheckCircle size={16} />
@@ -98,7 +223,7 @@ export default function Home() {
             </div>
             <div className="hero__badge">
               <CheckCircle size={16} />
-              <span>Annulation gratuite 24h</span>
+              <span>{isMedical ? 'Tiers-Payant (pas d\'avance)' : 'Annulation gratuite 24h'}</span>
             </div>
           </div>
         </div>
@@ -109,15 +234,30 @@ export default function Home() {
         <div className="container">
           <div className="section-header">
             <span className="section-label">Nos Services</span>
-            <h2>Un service adapté à<br /><span className="text-accent">chaque besoin</span></h2>
+            <h2>
+              {isMedical ? (
+                <>Un transport adapté à<br /><span className="text-accent">vos rendez-vous</span></>
+              ) : (
+                <>Un service adapté à<br /><span className="text-accent">chaque besoin</span></>
+              )}
+            </h2>
             <div className="divider" />
             <p className="subtitle">
-              Des transferts aéroport aux déplacements professionnels, {BRAND.name} vous accompagne
-              dans tous vos trajets alpins.
+              {isMedical ? (
+                <>
+                  Pour toutes vos démarches de santé, {BRAND.name} assure un transport assis professionnel 
+                  et discret dans tout le secteur d'Arles et de la région PACA.
+                </>
+              ) : (
+                <>
+                  Des transferts aéroport aux déplacements professionnels, {BRAND.name} vous accompagne
+                  dans tous vos trajets alpins.
+                </>
+              )}
             </p>
           </div>
           <div className="services__grid">
-            {SERVICES.map((service, index) => {
+            {services.map((service, index) => {
               const IconComponent = ICON_MAP[service.icon];
               return (
                 <div key={service.id} className={`card services__card animate-fade-in-up animate-delay-${index + 1}`}>
@@ -141,11 +281,17 @@ export default function Home() {
         <div className="container">
           <div className="section-header">
             <span className="section-label">Comment ça marche</span>
-            <h2>Réserver en<br /><span className="text-accent">3 étapes simples</span></h2>
+            <h2>
+              {isMedical ? (
+                <>Prise en charge en<br /><span className="text-accent">3 étapes faciles</span></>
+              ) : (
+                <>Réserver en<br /><span className="text-accent">3 étapes simples</span></>
+              )}
+            </h2>
             <div className="divider" />
           </div>
           <div className="steps__grid">
-            {STEPS.map((step, index) => (
+            {steps.map((step, index) => (
               <div key={step.number} className={`steps__item animate-fade-in-up animate-delay-${index + 1}`}>
                 <div className="steps__number">{step.number}</div>
                 <div className="steps__icon-wrap">
@@ -168,7 +314,7 @@ export default function Home() {
             <div className="divider" />
           </div>
           <div className="features__grid">
-            {FEATURES.map((feature, index) => (
+            {features.map((feature, index) => (
               <div key={feature.title} className={`features__item animate-fade-in-up animate-delay-${index + 1}`}>
                 <div className="features__icon">
                   <feature.icon size={24} />
@@ -188,18 +334,17 @@ export default function Home() {
         <div className="container">
           <div className="section-header">
             <span className="section-label">Destinations populaires</span>
-            <h2>Nos trajets les plus<br /><span className="text-accent">demandés</span></h2>
+            <h2>
+              {isMedical ? (
+                <>Établissements de santé<br /><span className="text-accent">les plus demandés</span></>
+              ) : (
+                <>Nos trajets les plus<br /><span className="text-accent">demandés</span></>
+              )}
+            </h2>
             <div className="divider" />
           </div>
           <div className="destinations__grid">
-            {[
-              { from: 'Aéroport de Genève', to: 'Courchevel', duration: '~2h30' },
-              { from: 'Aéroport de Genève', to: 'Val Thorens', duration: '~2h45' },
-              { from: 'Aéroport de Lyon', to: 'Courchevel', duration: '~3h' },
-              { from: 'Gare de Moutiers', to: 'Courchevel', duration: '~30 min' },
-              { from: 'Chambéry', to: 'Val Thorens', duration: '~1h45' },
-              { from: 'Genève Centre', to: 'Méribel', duration: '~2h30' },
-            ].map((route, index) => (
+            {destinations.map((route, index) => (
               <Link
                 key={index}
                 to={ROUTES.BOOKING}
@@ -236,7 +381,7 @@ export default function Home() {
             <div className="divider" />
           </div>
           <div className="testimonials__grid">
-            {TESTIMONIALS.map((t, index) => (
+            {testimonials.map((t, index) => (
               <div key={index} className={`card testimonials__card animate-fade-in-up animate-delay-${index + 1}`}>
                 <div className="testimonials__stars">
                   {Array.from({ length: t.rating }).map((_, i) => (
@@ -262,15 +407,30 @@ export default function Home() {
         <div className="container">
           <div className="cta__inner">
             <div className="cta__glow" />
-            <span className="section-label">Prêt à partir ?</span>
-            <h2>Réservez votre<br /><span className="text-gradient">transfert maintenant</span></h2>
+            <span className="section-label">Prêt à réserver ?</span>
+            <h2>
+              {isMedical ? (
+                <>Planifiez votre transport<br /><span className="text-gradient">médical dès maintenant</span></>
+              ) : (
+                <>Réservez votre<br /><span className="text-gradient">transfert maintenant</span></>
+              )}
+            </h2>
             <p className="subtitle" style={{ margin: '0 auto' }}>
-              Prix fixe, confirmation rapide, et un service de qualité.<br />
-              Votre chauffeur privé dans les Alpes vous attend.
+              {isMedical ? (
+                <>
+                  Chauffeurs formés, agréés CPAM. Tiers-payant intégral.<br />
+                  Votre accompagnement santé en toute sérénité.
+                </>
+              ) : (
+                <>
+                  Prix fixe, confirmation rapide, et un service de qualité.<br />
+                  Votre chauffeur privé dans les Alpes vous attend.
+                </>
+              )}
             </p>
             <div className="cta__actions">
               <Link to={ROUTES.BOOKING} className="btn btn-primary btn-lg">
-                Réserver un trajet
+                {isMedical ? 'Réserver un taxi conventionné' : 'Réserver un trajet'}
                 <ArrowRight size={20} />
               </Link>
             </div>

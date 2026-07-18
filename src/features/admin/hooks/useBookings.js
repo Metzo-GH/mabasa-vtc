@@ -7,6 +7,7 @@ export function useBookings() {
   const [error, setError] = useState(null);
   
   const [filter, setFilter] = useState('all');
+  const [serviceFilter, setServiceFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
@@ -20,7 +21,7 @@ export function useBookings() {
     setLoading(true);
     setError(null);
     try {
-      const data = await getBookings(filter);
+      const data = await getBookings(filter, serviceFilter);
       setBookings(data);
     } catch (err) {
       console.error('Fetch bookings error:', err);
@@ -28,7 +29,7 @@ export function useBookings() {
     } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, [filter, serviceFilter]);
 
   useEffect(() => {
     fetchBookings();
@@ -149,6 +150,8 @@ export function useBookings() {
     error,
     filter,
     setFilter,
+    serviceFilter,
+    setServiceFilter,
     dateFilter,
     setDateFilter,
     searchQuery,

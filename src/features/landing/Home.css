@@ -21,6 +21,12 @@
   z-index: 0;
 }
 
+body.theme-medical .hero__bg {
+  background:
+    url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&q=80')
+    center / cover no-repeat;
+}
+
 .hero__overlay {
   position: absolute;
   inset: 0;

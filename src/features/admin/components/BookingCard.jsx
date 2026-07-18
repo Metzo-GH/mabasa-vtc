@@ -40,10 +40,24 @@ export default function BookingCard({
           />
           <span className="admin-checkbox-custom"></span>
         </label>
-        <div className="booking-card__route">
-          <strong>{booking.departure}</strong>
-          <span className="booking-card__arrow">→</span>
-          <strong>{booking.arrival}</strong>
+        <div className="booking-card__route" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <span className="service-type-badge" style={{
+            fontSize: '9px',
+            fontWeight: 'bold',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            textTransform: 'uppercase',
+            background: booking.service_type === 'medical' ? 'rgba(14, 165, 233, 0.15)' : 'rgba(201, 168, 76, 0.15)',
+            color: booking.service_type === 'medical' ? '#0ea5e9' : '#C9A84C',
+            border: booking.service_type === 'medical' ? '1px solid rgba(14, 165, 233, 0.3)' : '1px solid rgba(201, 168, 76, 0.3)'
+          }}>
+            {booking.service_type === 'medical' ? 'Taxi Conventionné' : 'VTC'}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <strong>{booking.departure?.label || booking.departure}</strong>
+            <span className="booking-card__arrow">→</span>
+            <strong>{booking.arrival?.label || booking.arrival}</strong>
+          </span>
         </div>
         <div className="booking-card__meta">
           <span className="booking-card__date">
@@ -76,23 +90,61 @@ export default function BookingCard({
               <p><a href={`mailto:${booking.email}`}>{booking.email}</a></p>
             </div>
             <div>
-              <label>Type</label>
+              <label>Type de Trajet</label>
               <p>{booking.trip_type === 'roundtrip' ? 'Aller-retour' : 'Aller simple'}</p>
             </div>
-            <div>
-              <label>Passagers</label>
-              <p>{booking.passengers}</p>
-            </div>
-            <div>
-              <label>Bagages</label>
-              <p>{booking.luggage}</p>
-            </div>
-            {booking.flight_number && (
-              <div>
-                <label>N° de vol</label>
-                <p>{booking.flight_number}</p>
-              </div>
+
+            {booking.service_type === 'medical' ? (
+              <>
+                <div>
+                  <label>Personnes</label>
+                  <p>{booking.passengers === 2 ? 'Patient + Accompagnateur' : 'Patient seul'}</p>
+                </div>
+                <div>
+                  <label>Bon de Transport</label>
+                  <p style={{ color: booking.prescription_medicale ? '#10b981' : '#ef4444', fontWeight: '500' }}>
+                    {booking.prescription_medicale ? 'Oui (Présent)' : 'Non renseigné'}
+                  </p>
+                </div>
+                <div>
+                  <label>Motif Médical</label>
+                  <p style={{ textTransform: 'capitalize' }}>
+                    {booking.medical_motif === 'hospitalisation' && 'Hospitalisation'}
+                    {booking.medical_motif === 'consultation' && 'Consultation'}
+                    {booking.medical_motif === 'dialyse' && 'Dialyse / Chimio / Radio'}
+                    {booking.medical_motif === 'reeducation' && 'Rééducation'}
+                    {booking.medical_motif === 'autre' && 'Autre motif'}
+                    {!booking.medical_motif && 'Non renseigné'}
+                  </p>
+                </div>
+                <div>
+                  <label>Numéro de Sécurité Sociale</label>
+                  <p>{booking.secu_number || 'Non renseigné'}</p>
+                </div>
+                <div>
+                  <label>Caisse / Organisme</label>
+                  <p>{booking.caisse_affiliation || 'Non renseigné'}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label>Passagers</label>
+                  <p>{booking.passengers}</p>
+                </div>
+                <div>
+                  <label>Bagages</label>
+                  <p>{booking.luggage}</p>
+                </div>
+                {booking.flight_number && (
+                  <div>
+                    <label>N° de vol</label>
+                    <p>{booking.flight_number}</p>
+                  </div>
+                )}
+              </>
             )}
+
             {booking.trip_type === 'roundtrip' && booking.return_date && (
               <div>
                 <label>Retour</label>

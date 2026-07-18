@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { createBooking } from '../services/bookingService';
 import { validateStep1, validateStep2, sanitizeBookingData } from '../features/booking/utils/bookingValidation';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * Custom hook to manage the booking form state and logic.
  * Respects SRP by separating UI from business logic/validation.
  */
 export function useBookingForm(initialForm) {
-  const [form, setForm] = useState(initialForm);
+  const { mode } = useTheme();
+  const [form, setForm] = useState(() => ({ ...initialForm, serviceType: mode }));
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
@@ -22,7 +24,7 @@ export function useBookingForm(initialForm) {
   };
 
   const goToStep2 = () => {
-    const newErrors = validateStep1(form);
+    const newErrors = validateStep1(form, mode);
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       setStep(2);
@@ -60,7 +62,7 @@ export function useBookingForm(initialForm) {
 
   const handleReset = () => {
     setSubmitted(false);
-    setForm(initialForm);
+    setForm({ ...initialForm, serviceType: mode });
     setStep(1);
   };
 

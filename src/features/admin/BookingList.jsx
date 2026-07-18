@@ -26,6 +26,8 @@ export default function BookingList() {
     error,
     filter,
     setFilter,
+    serviceFilter,
+    setServiceFilter,
     dateFilter,
     setDateFilter,
     searchQuery,
@@ -48,9 +50,10 @@ export default function BookingList() {
   const [expandedId, setExpandedId] = useState(null);
 
   const exportCSV = () => {
-    const headers = ['Date', 'Départ', 'Arrivée', 'Client', 'Email', 'Téléphone', 'Statut', 'Prix (€)'];
+    const headers = ['Date', 'Type', 'Départ', 'Arrivée', 'Client', 'Email', 'Téléphone', 'Statut', 'Prix (€)'];
     const rows = filteredBookings.map(b => [
       new Date(b.created_at).toLocaleDateString('fr-FR'),
+      b.service_type === 'medical' ? 'Taxi Conventionné' : 'VTC Premium',
       b.departure,
       b.arrival,
       `${b.first_name} ${b.last_name}`,
@@ -129,6 +132,8 @@ export default function BookingList() {
           setSearchQuery={setSearchQuery}
           filter={filter}
           setFilter={setFilter}
+          serviceFilter={serviceFilter}
+          setServiceFilter={setServiceFilter}
           dateFilter={dateFilter}
           setDateFilter={setDateFilter}
         />
